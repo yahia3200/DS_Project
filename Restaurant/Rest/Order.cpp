@@ -23,17 +23,6 @@ ORD_TYPE Order::GetType() const
 }
 
 
-void Order::SetDistance(int d)
-{
-	Distance = d>0?d:0;
-}
-
-int Order::GetDistance() const
-{
-	return Distance;
-}
-
-
 void Order::setStatus(ORD_STATUS s)
 {
 	status = s;
@@ -42,5 +31,67 @@ void Order::setStatus(ORD_STATUS s)
 ORD_STATUS Order::getStatus() const
 {
 	return status;
+}
+
+void Order::setTotalMoney(double M)
+{
+	totalMoney = M;
+}
+
+double Order::getTotalMoney() const
+{
+	return totalMoney;
+}
+
+void Order::setOrderSize(int ordsize)
+{
+	orderSize = ordsize;
+}
+
+int Order::getOrderSize() const
+{
+	return orderSize;
+}
+
+void Order::setArrTime(int T)
+{
+	ArrTime = T;
+}
+
+int Order::getArrTime() const
+{
+	return ArrTime;
+}
+
+void Order::setServTime(int T)
+{
+	ServTime = T;
+}
+
+int Order::getServTime() const
+{
+	return ServTime;
+}
+
+void Order::setFinishTime(int T)
+{
+	FinishTime = T;
+}
+
+int Order::getFinishTime() const
+{
+	return FinishTime;
+}
+
+void Order::setWaitingTime(int T)
+{
+	WaitingTime = T;
+
+	FinishTime = ArrTime + WaitingTime + ServTime;
+}
+
+int Order::getWaitingTime() const
+{
+	return WaitingTime;
 }
 

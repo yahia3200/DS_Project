@@ -33,4 +33,24 @@ void Cook::setType(ORD_TYPE t)
 	type = t;
 }
 
+void Cook::setSpeed(int s)
+{
+	speed = s;
+}
+
+int Cook::getSpeed() const
+{
+	return speed;
+}
+
+void Cook::setFinishedOrders(int orders)
+{
+	finishedOrders = orders;
+}
+
+int Cook::getFinishedOrders() const
+{
+	return finishedOrders;
+}
+
 
