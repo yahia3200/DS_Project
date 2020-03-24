@@ -1,11 +1,13 @@
-#ifndef __RESTAURANT_H_
+#ifndef __RESTAURANT_H_\
 #define __RESTAURANT_H_
 
 #include "..\Defs.h"
 #include "..\CMUgraphicsLib\CMUgraphics.h"
 #include "..\GUI\GUI.h"
 #include "..\Generic_DS\Queue.h"
+#include "..\Generic_DS\LinkedList.h"
 #include "..\Events\Event.h"
+
 
 
 #include "Order.h"
@@ -17,6 +19,19 @@ private:
 	GUI *pGUI;
 	Queue<Event*> EventsQueue;	//Queue of all events that will be loaded from file
 
+	//
+	// TODO: Add More Data Members As Needed
+	//Noran //Add a queue for G orders Named Waiting_GO //GO stands for Vegan Orders
+	Queue<Order*> Waiting_GO;	//Important: This is just for demo
+
+	//Noran //Add a linkedlist for N orders Named Waiting_NO //NO stands for Normal Orders
+	LinkedList<Order*> Waiting_NO;
+
+	//Noran //Add a priority queue for V orders Named Waiting_VO //VO stands for VIP Orders
+	//Noran //Need the priority queue implementation
+
+	//
+
 	
 	/// ==> 
 	//	DEMO-related members. Should be removed in phases 1&2
@@ -25,10 +40,7 @@ private:
 	
 	
 	
-	//
-	// TODO: Add More Data Members As Needed
-	//
-
+	
 public:
 	
 	Restaurant();

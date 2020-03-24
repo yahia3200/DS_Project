@@ -101,6 +101,8 @@ void Restaurant::Just_A_Demo()
 	//Just for sake of demo, generate some cooks and add them to the drawing list
 	//In next phases, Cooks info should be loaded from input file
 	int C_count = 12;	
+	//Noran//notice that they added here the cooks in an array for the sake of demo
+	//Noran//we will add the Lists for the cooks in the constuctor of the Restaurant
 	Cook *pC = new Cook[C_count];
 	int cID = 1;
 
@@ -144,6 +146,7 @@ void Restaurant::Just_A_Demo()
 	{
 		//print current timestep
 		char timestep[10];
+		//Noran//This converts the int value in 'CurrentTimeStep' into strings and save that string into 'timestep'
 		itoa(CurrentTimeStep,timestep,10);	
 		pGUI->PrintMessage(timestep);
 
@@ -194,5 +197,8 @@ void Restaurant::AddtoDemoQueue(Order *pOrd)
 
 /// ==> end of DEMO-related function
 //////////////////////////////////////////////////////////////////////////////////////////////
+
+//Noran//We should add 3 functions similar to AddtoDemoQueue
+//Noran//i.e AddToWaitingGO(), AddToWaitingVO() and AddToWaitingNO();
 
 
