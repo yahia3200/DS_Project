@@ -7,6 +7,14 @@ ArrivalEvent::ArrivalEvent(int eTime, int oID, ORD_TYPE oType):Event(eTime, oID)
 	OrdType = oType;
 }
 
+
+ArrivalEvent::ArrivalEvent(ORD_TYPE oType, int eTime, int oID, int oSize, double oMoney) :Event(eTime, oID)
+{
+	OrdType = oType;
+	OrdSize = oSize;
+	OrdMoney = oMoney;
+}
+
 void ArrivalEvent::Execute(Restaurant* pRest)
 {
 	//This function should create an order and fills its data 

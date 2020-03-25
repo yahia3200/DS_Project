@@ -1,6 +1,8 @@
 #include <cstdlib>
 #include <time.h>
 #include <iostream>
+#include <fstream>
+
 using namespace std;
 
 #include "Restaurant.h"
@@ -69,7 +71,136 @@ void Restaurant::FillDrawingList()
 
 }
 
+void Restaurant::LoadFile()
+{
+	ifstream inFile("InFile.txt");
+	
+	//Handling errors
+	if (!inFile.is_open())
+	{
+		ofstream ErrorFile;
+		ErrorFile.open("Error.txt");
+		ErrorFile << "An Error Occured while opening the input file \n";
+		ErrorFile << "Check the mentioned instructions to help solve your problem: \n";
+		ErrorFile << "-Make sure you are placing the input file in the same directory as the Demo_Main.cpp \n";
+		ErrorFile << "-The file should not be in use \n";
+		ErrorFile.close();
+		exit(1);
+	}
 
+	//Loading Cooks-related data from the i/p file
+	inFile >> NumOfNC >> NumOfGC >> NumOfVC;
+	inFile >> SpeedOfNC >> SpeedOfGC >> SpeedOfVC;
+	inFile >>BO >> BreakOfNC >> BreakOfGC >> BreakOfVC;
+	inFile >> AutoP;
+	
+	//Populating cooks lists.
+	Cook* CookPtr;
+	int i = 0;
+	//Populating Normal cooks in their list
+	while (i<NumOfNC)
+	{
+		CookPtr = new Cook;
+		CookPtr->setID(i + 1);
+		CookPtr->setType(TYPE_NRM);
+		CookPtr->setSpeed(SpeedOfNC);
+		CookPtr->setFinishedOrders(0);
+		Available_NC.enqueue(CookPtr);
+		i++;
+	}
+	
+	i = 0;
+	//Populating Vegan cooks in their list
+	while (i<NumOfGC)
+	{
+		CookPtr = new Cook;
+		CookPtr->setID(i + 1 + NumOfNC);
+		CookPtr->setType(TYPE_VGAN);
+		CookPtr->setSpeed(SpeedOfGC);
+		CookPtr->setFinishedOrders(0);
+		Available_GC.enqueue(CookPtr);
+		i++;
+	}
+
+	i = 0;
+	//Populating VIP cooks in their list
+	while (i<NumOfVC)
+	{
+		CookPtr = new Cook;
+		CookPtr->setID(i + 1 + NumOfNC + NumOfGC);
+		CookPtr->setType(TYPE_VIP);
+		CookPtr->setSpeed(SpeedOfVC);
+		CookPtr->setFinishedOrders(0);
+		Available_VC.enqueue(CookPtr);
+		i++;
+	}
+
+	//Note that the NumOfEvents is the number of lines left in the i/p file
+	inFile >> NumOfEvents;
+
+	i = 0;
+	char EventType;
+	Event* EventPtr;
+	while (!inFile.eof() && i<NumOfEvents)
+	{
+		inFile >> EventType;
+		if (EventType == 'R')
+		{
+			char oType; int eTime; int oID; int oSize; double oMoney;
+			inFile >> oType >> eTime >> oID >> oSize >> oMoney;
+			EventPtr = new ArrivalEvent((ORD_TYPE)(CharToNum(oType)), eTime, oID, oSize, oMoney);
+			EventsQueue.enqueue(EventPtr);
+		}
+		else if (EventType == 'X')
+		{
+			int eTime; int oID;
+			inFile >> eTime >> oID;
+			//EventPtr = new CancellationEvent(eTime, oID);
+			EventsQueue.enqueue(EventPtr);
+		}
+		else if (EventType == 'P')
+		{
+			int eTime; int oID; double oExtraMoney;
+			inFile >> eTime >> oID >> oExtraMoney;
+			//EventPtr = new PromotionEvent(eTime, oID, oExtraMoney);
+			EventsQueue.enqueue(EventPtr);
+		}
+		else
+		{
+			inValidFormat();
+		}
+	}
+
+	inFile.close();
+
+}
+
+int Restaurant::CharToNum(char Type)
+{
+	switch (Type)
+	{
+	case 'N': 
+		return 0;
+	case 'G': 
+		return 1;
+	case 'V': 
+		return 2;
+	default: // code to be executed if 'Type' doesn't match any valid cases
+		inValidFormat();
+	}
+}
+
+void Restaurant::inValidFormat()
+{
+	ofstream ErrorFile;
+	ErrorFile.open("Error.txt");
+	ErrorFile << "Something is wrong with the input file's format \n ";
+	ErrorFile << "Refer to the document to help solve your problem: \n";
+	ErrorFile.close();
+	exit(1);
+
+
+}
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////

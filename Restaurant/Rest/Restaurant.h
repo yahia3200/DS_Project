@@ -22,7 +22,7 @@ private:
 	//
 	// TODO: Add More Data Members As Needed
 	//Noran //Add a queue for G orders Named Waiting_GO //GO stands for Vegan Orders
-	Queue<Order*> Waiting_GO;	//Important: This is just for demo
+	Queue<Order*> Waiting_GO;	
 
 	//Noran //Add a linkedlist for N orders Named Waiting_NO //NO stands for Normal Orders
 	LinkedList<Order*> Waiting_NO;
@@ -30,9 +30,28 @@ private:
 	//Noran //Add a priority queue for V orders Named Waiting_VO //VO stands for VIP Orders
 	//Noran //Need the priority queue implementation
 
-	//
+	Queue<Cook*> Available_NC; //Available Normal Cooks List
+	Queue<Cook*> Available_GC; //Available Vegan Cooks List
+	Queue<Cook*> Available_VC; //Available VIP Cooks List
 
+	//Noran//We will need this in the output file
+	//the number of cooks of different types
+	int NumOfNC; //For Noraml Cooks
+	int NumOfGC; //For Vegan Cooks
+	int NumOfVC; //For VIP Cooks
+	int NumOfEvents; //Number of Total Events
 	
+	int SpeedOfNC, SpeedOfGC, SpeedOfVC;
+
+	int BO; //the number of orders a cook must prepare before taking a break
+	int BreakOfNC; //the break duration (in timesteps) for normal cooks
+	int BreakOfGC; //the break duration (in timesteps) for Vegan cooks
+	int BreakOfVC; //the break duration (in timesteps) for VIP cooks
+
+	int AutoP; //the number of timesteps after which an order is automatically promoted to VIP.
+	
+	void inValidFormat(); //an error handling object
+
 	/// ==> 
 	//	DEMO-related members. Should be removed in phases 1&2
 	Queue<Order*> DEMO_Queue;	//Important: This is just for demo
@@ -57,6 +76,11 @@ public:
 	//
 	// TODO: Add More Member Functions As Needed
 	//
+	void LoadFile();
+	int CharToNum(char Type); //This function returns the number corresponding to each type's symbol
+	//i.e N --->0
+	//i.e G --->1
+	//i.e V --->2
 
 
 /// ===================    DEMO-related functions. Should be removed in phases 1&2   ================= 
