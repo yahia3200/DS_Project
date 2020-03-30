@@ -28,8 +28,8 @@ void Restaurant::RunSimulation()
 	case MODE_SLNT:
 		break;
 	case MODE_DEMO:
-		Just_A_Demo();
-
+		//Just_A_Demo();
+		SimpleSimulator();
 	};
 
 }
@@ -65,6 +65,99 @@ void Restaurant::FillDrawingList()
 {
 	//This function should be implemented in phase1
 	//It should add ALL orders and Cooks to the drawing list
+	Order*pOrd;
+	Queue<Order*> tempVo; //when in dequeue i ll temporarily place vip here
+	Queue<Order*> tempGo; // will temporary place vegan here
+	Node<Order*>* tempNo = Waiting_NO.GetHead();
+	//need a better way so that i will compare the arrival time of each
+	int VoTime, NoTime, GoTime = 0;
+	while (!Waiting_VO.isEmpty() || tempNo || !Waiting_GO.isEmpty()) 
+	{
+		if (!Waiting_GO.isEmpty()) { 
+		Waiting_GO.peekFront(pOrd);
+		GoTime=pOrd->getArrTime();
+		}
+	   else { GoTime = -1; }
+		if(!Waiting_VO.isEmpty()){
+			Waiting_VO.peekFront(pOrd);
+			VoTime = pOrd->getArrTime();
+		}
+		else {
+			VoTime = -1;
+		}
+		if (tempNo) {
+		NoTime=	tempNo->getItem()->getArrTime();
+		}
+		else { NoTime = -1; }
+		//////////till now all i did is getting the arrival time of each and if the list of any 
+		/////////is empty i set the time =-1/////////////////////////////////
+		//in case of the 3 types have same arrival time vip then normal then vegan ll be printed
+		if (VoTime != -1 && (GoTime == -1 && NoTime == -1)) {
+			Waiting_VO.dequeue(pOrd);
+			tempVo.enqueue(pOrd);
+			pGUI->AddToDrawingList(pOrd);
+		}
+		else if (VoTime <= NoTime && GoTime == -1  && VoTime != -1) {
+			Waiting_VO.dequeue(pOrd);
+			tempVo.enqueue(pOrd);
+			pGUI->AddToDrawingList(pOrd);
+		}
+		else if (VoTime <= GoTime && NoTime == -1 && VoTime != -1) {
+			Waiting_VO.dequeue(pOrd);
+			tempVo.enqueue(pOrd);
+			pGUI->AddToDrawingList(pOrd);
+		}
+
+		else if (VoTime <= NoTime && VoTime <= GoTime && VoTime != -1 ) {
+			Waiting_VO.dequeue(pOrd);
+			tempVo.enqueue(pOrd);
+			pGUI->AddToDrawingList(pOrd);
+		}
+		/////////////////if we reached this it means the vegan queue is out of comparison///////////
+		else if (NoTime != -1 && GoTime == -1) {
+			pGUI->AddToDrawingList(tempNo->getItem());
+			tempNo = tempNo->getNext();
+		}
+		else if (NoTime <= GoTime && NoTime != -1) {
+			pGUI->AddToDrawingList(tempNo->getItem());
+			tempNo = tempNo->getNext();
+		}
+		
+		else {
+			Waiting_GO.dequeue(pOrd);
+			tempGo.enqueue(pOrd);
+			pGUI->AddToDrawingList(pOrd);
+		}
+	}
+
+	///////////////////then i need to reset the Waiting_Vo and Waiting_Go  data //////////////
+	while (tempGo.dequeue(pOrd)) {
+		Waiting_GO.enqueue(pOrd);
+	}
+	while (tempVo.dequeue(pOrd)) {
+		Waiting_VO.enqueue(pOrd);
+	}
+	///////////////////////for cooks this will present each type of cook after each other/////////////////
+	int size = 0;
+	Cook** Cook_Array = Available_VC.toArray(size);
+	Cook* pCook;
+	for (int i = 0; i < size; i++)
+	{
+		pCook = Cook_Array[i];
+		pGUI->AddToDrawingList(pCook);
+	}
+	Cook_Array = Available_NC.toArray(size);
+	for (int i = 0; i < size; i++)
+	{
+		pCook = Cook_Array[i];
+		pGUI->AddToDrawingList(pCook);
+	}
+	Cook_Array = Available_GC.toArray(size);
+	for (int i = 0; i < size; i++)
+	{
+		pCook = Cook_Array[i];
+		pGUI->AddToDrawingList(pCook);
+	}
 	//It should get orders from orders lists/queues/stacks/whatever (same for Cooks)
 	//To add orders it should call function  void GUI::AddToDrawingList(Order* pOrd);
 	//To add Cooks it should call function  void GUI::AddToDrawingList(Cook* pCc);
@@ -203,6 +296,27 @@ void Restaurant::inValidFormat()
 }
 
 
+
+void Restaurant::SimpleSimulator()
+{
+	int CurrentTimeStep = 1;
+	LoadFile();
+	while (!EventsQueue.isEmpty()) {
+		char timestep[10];
+		itoa(CurrentTimeStep, timestep, 10);
+		pGUI->PrintMessage(timestep);
+		ExecuteEvents(CurrentTimeStep);
+		this->FillDrawingList();
+		pGUI->UpdateInterface();
+		Sleep(1000);
+		CurrentTimeStep++;	
+		pGUI->ResetDrawingList();
+
+	}
+	pGUI->PrintMessage("generation done, click to END program");
+	pGUI->waitForClick();
+
+}
 //////////////////////////////////////////////////////////////////////////////////////////////
 /// ==> 
 ///  DEMO-related functions. Should be removed in phases 1&2
@@ -331,5 +445,33 @@ void Restaurant::AddtoDemoQueue(Order *pOrd)
 
 //Noran//We should add 3 functions similar to AddtoDemoQueue
 //Noran//i.e AddToWaitingGO(), AddToWaitingVO() and AddToWaitingNO();
+
+//hala //i made it in one function called ToWaitinglist()
+//the function's responsible of choosing the right waiting list 
+//and filling it : if u have any idea to separate them into 3 function tell me to update that
+void Restaurant:: ToWaitingList( Order * neworder)
+{
+	/*ORD_TYPE type = arrevent->GetOrdType();
+	int id=arrevent->getOrderID();
+	int etime=arrevent->getEventTime();
+	int size=arrevent->GetOrdSize();
+double money=arrevent->GetOrdMoney();
+ Order* neworder = new Order(id,type,WAIT,money,size,etime); 
+ delete arrevent; */
+
+ORD_TYPE type=	neworder->GetType();
+switch (type) {
+case  TYPE_NRM:
+	Waiting_NO.insertEnd(neworder);
+	break;
+case TYPE_VGAN:
+	Waiting_GO.enqueue(neworder);
+	break;
+case TYPE_VIP:
+	Waiting_VO.enqueue(neworder);
+	break;
+}
+neworder->setStatus(WAIT);
+}
 
 

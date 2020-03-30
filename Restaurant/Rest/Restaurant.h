@@ -25,10 +25,15 @@ private:
 	Queue<Order*> Waiting_GO;	
 
 	//Noran //Add a linkedlist for N orders Named Waiting_NO //NO stands for Normal Orders
-	LinkedList<Order*> Waiting_NO;
+	LinkedList <Order*> Waiting_NO;
 
 	//Noran //Add a priority queue for V orders Named Waiting_VO //VO stands for VIP Orders
 	//Noran //Need the priority queue implementation
+	
+	//hala // will temporary create a queue for the V orders Named Waition_VO//VO for VIP orders
+	//this will instatnly be changed once we have a priority queue
+	//but just for the time being to test simulating function
+	Queue <Order*> Waiting_VO;
 
 	Queue<Cook*> Available_NC; //Available Normal Cooks List
 	Queue<Cook*> Available_GC; //Available Vegan Cooks List
@@ -81,7 +86,11 @@ public:
 	//i.e N --->0
 	//i.e G --->1
 	//i.e V --->2
-
+	void SimpleSimulator();
+	//hala //not yet sure if i needed to make it private or not
+	//this function changes an arrival event to an order 
+	//it places it in the appropriate waiting list 
+	void ToWaitingList (Order * neworder);
 
 /// ===================    DEMO-related functions. Should be removed in phases 1&2   ================= 
 

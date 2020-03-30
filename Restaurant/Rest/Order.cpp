@@ -6,7 +6,13 @@ Order::Order(int id, ORD_TYPE r_Type)
 	type = r_Type;
 	status = WAIT;
 }
-
+Order::Order(int id, ORD_TYPE r_type, double money, int r_size, int etime) {
+	ID = (id > 0 && id < 1000) ? id : 0;
+	type = r_type;
+	totalMoney = money;
+	orderSize = r_size;
+	ArrTime = etime;
+}
 Order::~Order()
 {
 }

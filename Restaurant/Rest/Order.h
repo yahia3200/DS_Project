@@ -20,6 +20,9 @@ protected:
 
 public:
 	Order(int ID, ORD_TYPE r_Type);
+	//hala// added a constructor to facilitate creating an order object
+	//etime for the arrival time
+	Order(int id, ORD_TYPE r_type, double money, int r_size, int etime);
 	virtual ~Order();
 
 	int GetID();
