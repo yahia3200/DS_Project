@@ -25,6 +25,8 @@ public:
 
 	void printList();     //To test the linkedlist implementation
 						  //Should be DELETED before delivering phase1
+	//hala //i need getter for head
+	Node<T>*GetHead();
 
 
 }; // end Node
@@ -36,6 +38,11 @@ LinkedList<T>::LinkedList()
 	Head = nullptr;
 	Tail = nullptr;
 	count = 0;
+}
+
+template<typename T>
+Node<T>* LinkedList<T>::GetHead() {
+	return Head;
 }
 
 template < typename T>
