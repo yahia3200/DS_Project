@@ -18,9 +18,14 @@ public:
 	//data members are added with the same order provided in the i/p file
 	ArrivalEvent(ORD_TYPE oType, int eTime, int oID, int oSize, double oMoney);
 
+	
 
 
 	virtual void Execute(Restaurant *pRest);	//override execute function
+	//hala // i need getters for the constructor of order
+	int GetOrdSize();
+	ORD_TYPE GetOrdType();
+	double GetOrdMoney();
 
 };
 

@@ -8,6 +8,15 @@ ArrivalEvent::ArrivalEvent(int eTime, int oID, ORD_TYPE oType):Event(eTime, oID)
 }
 
 
+ORD_TYPE ArrivalEvent:: GetOrdType() {
+	return OrdType;
+}
+int ArrivalEvent::GetOrdSize() {
+	return OrdSize;
+}
+double ArrivalEvent :: GetOrdMoney() {
+	return OrdMoney;
+}
 ArrivalEvent::ArrivalEvent(ORD_TYPE oType, int eTime, int oID, int oSize, double oMoney) :Event(eTime, oID)
 {
 	OrdType = oType;
@@ -24,6 +33,8 @@ void ArrivalEvent::Execute(Restaurant* pRest)
 	
 	///For the sake of demo, this function will just create an order and add it to DemoQueue
 	///Remove the next code lines in phases 1&2
-	Order* pOrd = new Order(OrderID,OrdType);
-	pRest->AddtoDemoQueue(pOrd);
+	//Order* pOrd = new Order(OrderID,OrdType);
+	Order* pOrd = new Order(OrderID, OrdType,OrdMoney,OrdSize,EventTime);
+	//pRest->AddtoDemoQueue(pOrd);
+	pRest->ToWaitingList(pOrd);
 }

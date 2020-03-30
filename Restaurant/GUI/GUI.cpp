@@ -221,7 +221,7 @@ void GUI::UpdateInterface()
 /*
 	AddOrderForDrawing: Adds a new item related to the passed Order to the drawing list
 */
-void GUI::AddToDrawingList(Order* pOrd)
+void GUI::AddToDrawingList(Order * pOrd)           //i added  & to see if the prob with copy constructor
 {
 	
 	DrawingItem *pDitem=new DrawingItem;
