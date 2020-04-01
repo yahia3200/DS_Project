@@ -73,8 +73,7 @@ public:
 	void ExecuteEvents(int TimeStep);	//executes all events at current timestep
 	void RunSimulation();
 
-	
-
+	ORD_TYPE PriorityDrawing(int& VoTime, int& NoTime, int& GoTime);
 
 	void FillDrawingList();
 
