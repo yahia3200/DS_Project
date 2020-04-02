@@ -12,3 +12,4 @@ void CancelEvent::Execute(Restaurant* pRest)
 {
 
 }
+

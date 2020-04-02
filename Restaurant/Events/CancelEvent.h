@@ -9,7 +9,8 @@ class CancelEvent : public Event
 public:
 	CancelEvent(int eTime, int oID);
 
-	virtual void Execute(Restaurant *pRest);	//override execute function
+	virtual void Execute(Restaurant* pRest);	//override execute function
 };
 
 #endif
+

@@ -10,7 +10,7 @@ class PromoteEvent : public Event
 public:
 	PromoteEvent(int eTime, int oID, double oExtraMoney);
 
-	virtual void Execute(Restaurant *pRest);	//override execute function
+	virtual void Execute(Restaurant* pRest);	//override execute function
 };
 
 #endif
