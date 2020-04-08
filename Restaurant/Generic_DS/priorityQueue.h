@@ -1,4 +1,6 @@
 #include"TNode.h"
+#include "..\Rest\Order.h"
+#include "..\Rest\Cook.h"
 #include<iostream> 
 using namespace std;
 #ifndef _PRIORITY_QUEUE_H
@@ -8,11 +10,11 @@ using namespace std;
 template<typename T>
 class PriorityQueue
 {
-	Node<T>* Root;
+	TNode<T>* Root;
 	int count = 0; //number of nodes in the tree
-	Node<T>* DeleteNode(Node<T>* root, int value, Node<T>*& remove) //Function to delete node which its priority corresponds to "value"
+	TNode<T>* DeleteNode(TNode<T>* root, int value, TNode<T>*& remove) //Function to delete node which its priority corresponds to "value"
 	{
-		Node<T>* Rptr = Root;
+		TNode<T>* Rptr = Root;
 		if (root == NULL) return root;
 		if (Root->getpriority() == value) //in case the node to be deleted is the root 
 		{
@@ -37,30 +39,30 @@ class PriorityQueue
 
 			if (root->getright() == NULL)
 			{
-				Node<T>* target = new Node<T>(root);
+				TNode<T>* target = new TNode<T>(root);
 				remove = target;
-				Node<T>* temp = root;
+				TNode<T>* temp = root;
 				root = root->getleft();
 				delete temp;
 			}
 			else if (root->getleft() == NULL)
 			{
-				Node<T>* target = new Node<T>(root);
+				TNode<T>* target = new TNode<T>(root);
 				remove = target;
-				Node<T>* temp = root;
+				TNode<T>* temp = root;
 				root = root->getright();
 				delete temp;
 			}
 			else if (root->getright() == NULL && root->getleft() == NULL)
 			{
-				Node<T>* target = new Node<T>(root);
+				TNode<T>* target = new TNode<T>(root);
 				remove = target;
 				delete root;
 				root = NULL;
 			}
 			else
 			{
-				Node<T>* ptr = rec_max(root->getright());
+				TNode<T>* ptr = rec_max(root->getright());
 				root->setitem(ptr->getitem());
 				root->setpriority(ptr->getpriority());
 				root->getright() = DeleteNode(root->getright(), ptr->getpriority(), remove);
@@ -69,42 +71,42 @@ class PriorityQueue
 
 		return root;
 	}
-	void insert(Node<T>*& subroot, T id, int p) // insert new node based on it's priority
+	void insert(TNode<T>*& subroot, T item,float p) // insert new node based on it's priority
 	{
 		if (subroot == NULL)
-			subroot = new Node<T>(id, p);
+			subroot = new TNode<T>(item,p);
 		else if (subroot->getpriority() < p)
 		{
-			insert(subroot->getright(), id, p);
+			insert(subroot->getright(), item),p;
 		}
 		else
 		{
-			insert(subroot->getleft(), id, p);
+			insert(subroot->getleft(), item,p);
 		}
 	}
 
-	Node<T>* rec_max(Node<T>* subroot) // recursive function to find max priority of the nodes
+	TNode<T>* rec_max(TNode<T>* subroot) // recursive function to find max priority of the nodes
 	{
 		if (!subroot) return nullptr;
-		Node<T>* max = subroot;
-		Node<T>* Lmax = rec_max(subroot->getleft());
-		Node<T>* Rmax = rec_max(subroot->getright());
+		TNode<T>* max = subroot;
+		TNode<T>* Lmax = rec_max(subroot->getleft());
+		TNode<T>* Rmax = rec_max(subroot->getright());
 		if (Lmax && Lmax->getpriority() > max->getpriority())   max = Lmax;
 		if (Rmax && Rmax->getpriority() > max->getpriority())  max = Rmax;
 		//cout << max << endl;
 		return max;
 	}
-	Node<T>* rec_min(Node<T>* subroot) // recursive function to find min priority of the nodes
+	TNode<T>* rec_min(TNode<T>* subroot) // recursive function to find min priority of the nodes
 	{
 		if (!subroot) return nullptr;
-		Node<T>* min = subroot;
-		Node<T>* Rmin = rec_min(subroot->getright());
-		Node<T>* Lmin = rec_min(subroot->getleft());
+		TNode<T>* min = subroot;
+		TNode<T>* Rmin = rec_min(subroot->getright());
+		TNode<T>* Lmin = rec_min(subroot->getleft());
 		if (Lmin && Lmin->getpriority() < min->getpriority())   min = Lmin;
 		if (Rmin && Rmin->getpriority() < min->getpriority())  min = Rmin;
 		return min;
 	}
-	void preorder(Node<T>* subroot) // in sequence (root -> left -> right)
+	void preorder(TNode<T>* subroot) // in sequence (root -> left -> right)
 	{
 		if (Root == nullptr) { cout << "NULL"; return; }
 		if (subroot == nullptr) { return; }
@@ -113,7 +115,7 @@ class PriorityQueue
 		preorder(subroot->getright());
 	}
 
-	void dtree(Node<T>*& subroot) //Destroy Tree (Deletes all the nodes in the tree)
+	void dtree(TNode<T>*& subroot) //Destroy Tree (Deletes all the nodes in the tree)
 	{
 		if (subroot != nullptr)
 		{
@@ -127,52 +129,100 @@ class PriorityQueue
 	}
 
 public:
-	PriorityQueue()
-	{
-		Root = nullptr;
-	}
-	Node<T>* getroot()const
-	{
-		return Root;
-	}
+	PriorityQueue();
+	TNode<T>* getroot()const;
+	TNode<T>* find_max();
+	TNode<T>* find_min();
+	bool isEmpty()const;
+	//bool peekFront()const;
+	void enqueue(T item);
+	T* toArray(int size);
+	TNode<T>* dequeue();
+	void Print_preorder();
 
-	Node<T>* find_max()
-	{
-		return rec_max(this->Root);
-	}
-	Node<T>* find_min()
-	{
-		return rec_min(this->Root);
-	}
-	void Enqueue(T item, float p)
-	{
-		count++;
-		insert(Root, item, p);
-
-	}
-	Node<T>* Dequeue()
-	{
-		Node<T>* max = find_max();
-
-		Node<T>* deleted = nullptr;
-		if (!max) return deleted;
-		DeleteNode(Root, max->getpriority(), deleted);
-
-		return deleted;
-	}
-
-
-	void Print_preorder() // just for testing the implemention
-	{
-		preorder(Root);
-	}
-
-	~PriorityQueue()
-	{
-
-		dtree(Root);
-	}
-
-
+	~PriorityQueue();
 };
+template<typename T>
+PriorityQueue<T>::PriorityQueue()
+{
+	Root = nullptr;
+}
+template <typename T>
+bool PriorityQueue<T>::isEmpty() const
+{
+	if (Root == nullptr)
+		return true;
+	else
+		return false;
+}
+template<typename T>
+TNode<T>* PriorityQueue<T>::getroot()const
+{
+	return Root;
+}
+template<typename T>
+TNode<T>* PriorityQueue<T>::find_max()
+{
+	return rec_max(this->Root);
+}
+template<typename T>
+TNode<T>* PriorityQueue<T>::find_min()
+{
+	return rec_min(this->Root);
+}
+template<typename T>
+void PriorityQueue<T>::enqueue(T item)
+{
+	count++;
+	insert(Root, item);
+
+}
+template<typename T>
+TNode<T>* PriorityQueue<T>::dequeue()
+{
+	TNode<Order>* max = find_max();
+
+	TNode<T>* deleted = nullptr;
+	if (!max) return deleted;
+	DeleteNode(Root, max->getpriority(), deleted);
+	count--;
+	return deleted;
+}
+//TNode<Cook>* PriorityQueue<Cook>::dequeue()
+//{
+//	TNode<Cook>* min = find_min();
+//
+//	TNode<Cook>* deleted = nullptr;
+//	if (!min) return deleted;
+//	DeleteNode(Root, min->getpriority(), deleted);
+//	count--;
+//	return deleted;
+//}
+
+template<typename T>
+void PriorityQueue<T>::Print_preorder() // just for testing the implemention
+{
+	preorder(Root);
+}
+
+template<typename T>
+T* PriorityQueue<T>::toArray(int size) //must be used for vip orders only
+{
+
+	T* arr = new T[size];
+	for(int i=0;i<size;i++)
+	{
+		arr[i] = find_max();
+	}
+	return arr;
+}
+
+template<typename T>
+PriorityQueue<T>::~PriorityQueue()
+{
+
+	dtree(Root);
+}
+
+
 #endif

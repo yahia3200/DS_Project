@@ -1,4 +1,5 @@
-#ifndef __RESTAURANT_H_\
+
+#ifndef __RESTAURANT_H_/
 #define __RESTAURANT_H_
 
 #include "..\Defs.h"
@@ -6,6 +7,7 @@
 #include "..\GUI\GUI.h"
 #include "..\Generic_DS\Queue.h"
 #include "..\Generic_DS\LinkedList.h"
+#include "..\Generic_DS\priorityQueue.h"
 #include "..\Events\Event.h"
 
 
@@ -33,7 +35,8 @@ private:
 	//hala // will temporary create a queue for the V orders Named Waition_VO//VO for VIP orders
 	//this will instatnly be changed once we have a priority queue
 	//but just for the time being to test simulating function
-	Queue <Order*> Waiting_VO;
+
+	Queue<Order*> Waiting_VO;// menna//i changed it to priorityQueue
 
 	Queue<Cook*> Available_NC; //Available Normal Cooks List
 	Queue<Cook*> Available_GC; //Available Vegan Cooks List
