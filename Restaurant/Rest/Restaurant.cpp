@@ -226,8 +226,8 @@ void Restaurant::FillDrawingList()
 			Waiting_VO.dequeue(pOrd);
 			tempVo.enqueue(pOrd);
 			pGUI->AddToDrawingList(pOrd);
-		}
 
+		}
 		else if (VoTime <= NoTime && VoTime <= GoTime && VoTime != -1 ) {
 			Waiting_VO.dequeue(pOrd);
 			tempVo.enqueue(pOrd);

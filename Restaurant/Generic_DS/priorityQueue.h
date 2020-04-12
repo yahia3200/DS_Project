@@ -5,18 +5,16 @@
 using namespace std;
 #ifndef _PRIORITY_QUEUE_H
 #define _PRIORITY_QUEUE_H
-
-
 template<typename T>
 class PriorityQueue
 {
 	TNode<T>* Root;
 	int count = 0; //number of nodes in the tree
-	TNode<T>* DeleteNode(TNode<T>* root, int value, TNode<T>*& remove) //Function to delete node which its priority corresponds to "value"
+	TNode<T>* DeleteNode(TNode<T>* root, Node<T>*value, TNode<T>*& remove) //Function to delete node which its priority corresponds to "value"
 	{
 		TNode<T>* Rptr = Root;
 		if (root == NULL) return root;
-		if (Root->getpriority() == value) //in case the node to be deleted is the root 
+		if (Root == value) //in case the node to be deleted is the root 
 		{
 			remove = Root;
 			if (!Root->getleft()) Root = Root->getright();
@@ -26,12 +24,10 @@ class PriorityQueue
 				Root = NULL;
 			}
 			return Root;
-
 		}
-
-		if (value < root->getpriority())
+		if (root > value)
 			root->setleft(DeleteNode(root->getleft(), value, remove));
-		else if (value > root->getpriority())
+		else if (value > root)
 			root->setright(DeleteNode(root->getright(), value, remove));
 
 		else // if value is same as root's priority, then This is the node to be deleted 
@@ -64,24 +60,23 @@ class PriorityQueue
 			{
 				TNode<T>* ptr = rec_max(root->getright());
 				root->setitem(ptr->getitem());
-				root->setpriority(ptr->getpriority());
-				root->getright() = DeleteNode(root->getright(), ptr->getpriority(), remove);
+				root->setright(DeleteNode(root->getright(), ptr, remove));
 			}
 		}
 
 		return root;
 	}
-	void insert(TNode<T>*& subroot, T item,float p) // insert new node based on it's priority
+	void insert(TNode<T>*& subroot, T item) // insert new node based on it's priority
 	{
 		if (subroot == NULL)
-			subroot = new TNode<T>(item,p);
-		else if (subroot->getpriority() < p)
+			subroot = new TNode<T>(item);
+		else if (subroot < item)
 		{
-			insert(subroot->getright(), item),p;
+			insert(subroot->getright(),item);
 		}
 		else
 		{
-			insert(subroot->getleft(), item,p);
+			insert(subroot->getleft(), item);
 		}
 	}
 
@@ -91,26 +86,16 @@ class PriorityQueue
 		TNode<T>* max = subroot;
 		TNode<T>* Lmax = rec_max(subroot->getleft());
 		TNode<T>* Rmax = rec_max(subroot->getright());
-		if (Lmax && Lmax->getpriority() > max->getpriority())   max = Lmax;
-		if (Rmax && Rmax->getpriority() > max->getpriority())  max = Rmax;
+		if (Lmax && Lmax > max)  max = Lmax;
+		if (Rmax && Rmax > max)  max = Rmax;
 		//cout << max << endl;
 		return max;
-	}
-	TNode<T>* rec_min(TNode<T>* subroot) // recursive function to find min priority of the nodes
-	{
-		if (!subroot) return nullptr;
-		TNode<T>* min = subroot;
-		TNode<T>* Rmin = rec_min(subroot->getright());
-		TNode<T>* Lmin = rec_min(subroot->getleft());
-		if (Lmin && Lmin->getpriority() < min->getpriority())   min = Lmin;
-		if (Rmin && Rmin->getpriority() < min->getpriority())  min = Rmin;
-		return min;
 	}
 	void preorder(TNode<T>* subroot) // in sequence (root -> left -> right)
 	{
 		if (Root == nullptr) { cout << "NULL"; return; }
 		if (subroot == nullptr) { return; }
-		cout << subroot->getitem() << ',' << subroot->getpriority() << "  ";
+		cout << subroot->getitem() << "  ";
 		preorder(subroot->getleft());
 		preorder(subroot->getright());
 	}
@@ -139,7 +124,6 @@ public:
 	T* toArray(int size);
 	TNode<T>* dequeue();
 	void Print_preorder();
-
 	~PriorityQueue();
 };
 template<typename T>
@@ -180,24 +164,14 @@ void PriorityQueue<T>::enqueue(T item)
 template<typename T>
 TNode<T>* PriorityQueue<T>::dequeue()
 {
-	TNode<Order>* max = find_max();
+	TNode<T>* max = find_max();
 
 	TNode<T>* deleted = nullptr;
 	if (!max) return deleted;
-	DeleteNode(Root, max->getpriority(), deleted);
+	DeleteNode(Root, max, deleted);
 	count--;
 	return deleted;
 }
-//TNode<Cook>* PriorityQueue<Cook>::dequeue()
-//{
-//	TNode<Cook>* min = find_min();
-//
-//	TNode<Cook>* deleted = nullptr;
-//	if (!min) return deleted;
-//	DeleteNode(Root, min->getpriority(), deleted);
-//	count--;
-//	return deleted;
-//}
 
 template<typename T>
 void PriorityQueue<T>::Print_preorder() // just for testing the implemention
@@ -206,7 +180,8 @@ void PriorityQueue<T>::Print_preorder() // just for testing the implemention
 }
 
 template<typename T>
-T* PriorityQueue<T>::toArray(int size) //must be used for vip orders only
+T* PriorityQueue<T>::toArray(int size) 
+
 {
 
 	T* arr = new T[size];
@@ -216,13 +191,11 @@ T* PriorityQueue<T>::toArray(int size) //must be used for vip orders only
 	}
 	return arr;
 }
-
 template<typename T>
 PriorityQueue<T>::~PriorityQueue()
 {
 
 	dtree(Root);
 }
-
-
 #endif
+				
