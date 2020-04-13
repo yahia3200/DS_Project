@@ -124,6 +124,7 @@ bool Order::operator>(const Order& O2)
 			return (ServTime < O2.ServTime);
 		else
 			return (FinishTime < O2.FinishTime);
+
 	}
 	
 	// just any valid comparison
