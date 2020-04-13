@@ -103,3 +103,29 @@ int Order::getWaitingTime() const
 	return WaitingTime;
 }
 
+bool Order::operator==(const Order& O2)
+{
+	return (ID == O2.ID);
+}
+
+// priority of orders
+bool Order::operator>(const Order& O2)
+{
+	if (status == WAIT && type == TYPE_VIP)
+	{
+		// priority equation for VIB orders 
+		return ((0.3 * ArrTime + 0.5 * totalMoney - 0.2 * orderSize) >
+				(0.3 * O2.ArrTime + 0.5 * O2.totalMoney - 0.2 * O2.orderSize));
+	}
+	else if (status == SRV)
+	{
+		if (FinishTime < O2.FinishTime)
+			return true;
+		else
+			return (ServTime < O2.ServTime);
+	}
+	
+	// just any valid comparison
+	return (ArrTime < O2.ArrTime);
+}
+

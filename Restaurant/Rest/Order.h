@@ -51,6 +51,9 @@ public:
 	void setWaitingTime(int T);  //Finish Time will be set also here
 	int getWaitingTime() const;
 
+	bool operator==(const Order&);
+	bool operator>(const Order&);
+
 };
 
 #endif

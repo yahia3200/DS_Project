@@ -14,6 +14,14 @@ enum ORD_TYPE	//types of orders
 
 };
 
+enum COOK_STATUS
+{
+	AVAILABLE,
+	BUSY,
+	BREAK,
+	COOK_STATUS_CNT
+};
+
 enum ORD_STATUS	//order status
 {
 	WAIT,	//waiting to be served

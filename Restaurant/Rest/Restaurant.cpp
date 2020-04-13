@@ -318,6 +318,7 @@ void Restaurant::LoadFile()
 		CookPtr->setType(TYPE_NRM);
 		CookPtr->setSpeed(SpeedOfNC);
 		CookPtr->setFinishedOrders(0);
+		CookPtr->setBreakDuration(BreakOfNC);
 		Available_NC.enqueue(CookPtr);
 		i++;
 	}
@@ -331,6 +332,7 @@ void Restaurant::LoadFile()
 		CookPtr->setType(TYPE_VGAN);
 		CookPtr->setSpeed(SpeedOfGC);
 		CookPtr->setFinishedOrders(0);
+		CookPtr->setBreakDuration(BreakOfGC);
 		Available_GC.enqueue(CookPtr);
 		i++;
 	}
@@ -344,6 +346,7 @@ void Restaurant::LoadFile()
 		CookPtr->setType(TYPE_VIP);
 		CookPtr->setSpeed(SpeedOfVC);
 		CookPtr->setFinishedOrders(0);
+		CookPtr->setBreakDuration(BreakOfVC);
 		Available_VC.enqueue(CookPtr);
 		i++;
 	}
