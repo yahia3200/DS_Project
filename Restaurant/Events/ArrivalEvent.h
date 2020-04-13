@@ -22,10 +22,6 @@ public:
 
 
 	virtual void Execute(Restaurant *pRest);	//override execute function
-	//hala // i need getters for the constructor of order
-	int GetOrdSize();
-	ORD_TYPE GetOrdType();
-	double GetOrdMoney();
 
 };
 

@@ -61,126 +61,7 @@ Restaurant::~Restaurant()
 			delete pGUI;
 }
 
-//Noran
-//I have modified the FillDrawingList function
-//I have reduced the use of if-conditions by a switch case and a priorityDrawing function
 
-ORD_TYPE Restaurant::PriorityDrawing(int& VoTime, int& NoTime, int& GoTime)
-{ 
-	//Noran//This function returns the typr of the order who deserves to be drawn first
-	int Min = VoTime;
-	ORD_TYPE TheDeservedType = TYPE_VIP;
-	if (NoTime<Min)
-	{
-		Min = NoTime;
-		TheDeservedType = TYPE_NRM;
-	}
-	if (GoTime < Min)
-	{
-		Min = GoTime;
-		TheDeservedType = TYPE_VGAN;
-	}
-	return TheDeservedType;
-}
-
-//Noran//////////////The commented function below is the modified version I added///////////////
-
-/*
-void Restaurant::FillDrawingList()
-{
-	//This function should be implemented in phase1
-	//It should add ALL orders and Cooks to the drawing list
-	Order*pOrd;
-	Queue<Order*> tempVo; //when in dequeue i ll temporarily place vip here
-	Queue<Order*> tempGo; // will temporary place vegan here
-	Node<Order*>* tempNo = Waiting_NO.GetHead();
-	//need a better way so that i will compare the arrival time of each
-	int VoTime, NoTime, GoTime = 0;
-	while (!Waiting_VO.isEmpty() || tempNo || !Waiting_GO.isEmpty())
-	{
-		if (Waiting_GO.peekFront(pOrd))
-		{
-			GoTime = pOrd->getArrTime();
-		}
-		else { GoTime = INT_MAX; }
-		if (Waiting_VO.peekFront(pOrd))
-		{
-			VoTime = pOrd->getArrTime();
-		}
-		else { VoTime = INT_MAX; }
-		if (tempNo)
-		{
-			NoTime = (tempNo->getItem())->getArrTime();
-		}
-		else { NoTime = INT_MAX; }
-
-		//////////till now all i did is getting the arrival time of each and if the list of any 
-		/////////is empty i set the time =-1/////////////////////////////////
-		//in case of the 3 types have same arrival time vip then normal then vegan ll be printed
-
-		//Noran I have modified this to be combatible with the PriorityDrawing function
-		//so I setted the time of any emtpy list by the Max-integer value 
-
-		ORD_TYPE TheDeservedType = PriorityDrawing(VoTime, NoTime, GoTime);
-
-		switch (TheDeservedType)
-		{
-		case TYPE_VIP:
-			Waiting_VO.dequeue(pOrd);
-			tempVo.enqueue(pOrd);
-			pGUI->AddToDrawingList(pOrd);
-			break;
-		case  TYPE_NRM:
-			pGUI->AddToDrawingList(tempNo->getItem());
-			tempNo = tempNo->getNext();
-			break;
-		case TYPE_VGAN:
-			Waiting_GO.dequeue(pOrd);
-			tempGo.enqueue(pOrd);
-			pGUI->AddToDrawingList(pOrd);
-			break;
-		}
-	}
-
-	///////////////////then i need to reset the Waiting_Vo and Waiting_Go  data //////////////
-	while (tempGo.dequeue(pOrd)) {
-		Waiting_GO.enqueue(pOrd);
-	}
-	while (tempVo.dequeue(pOrd)) {
-		Waiting_VO.enqueue(pOrd);
-	}
-	///////////////////////for cooks this will present each type of cook after each other/////////////////
-	int size = 0;
-	Cook** Cook_Array = Available_VC.toArray(size);
-	Cook* pCook;
-	for (int i = 0; i < size; i++)
-	{
-		pCook = Cook_Array[i];
-		pGUI->AddToDrawingList(pCook);
-	}
-	Cook_Array = Available_NC.toArray(size);
-	for (int i = 0; i < size; i++)
-	{
-		pCook = Cook_Array[i];
-		pGUI->AddToDrawingList(pCook);
-	}
-	Cook_Array = Available_GC.toArray(size);
-	for (int i = 0; i < size; i++)
-	{
-		pCook = Cook_Array[i];
-		pGUI->AddToDrawingList(pCook);
-	}
-	//It should get orders from orders lists/queues/stacks/whatever (same for Cooks)
-	//To add orders it should call function  void GUI::AddToDrawingList(Order* pOrd);
-	//To add Cooks it should call function  void GUI::AddToDrawingList(Cook* pCc);
-<<<<<<< Updated upstream
-}
-
-*/
-                         /////////////End of the Modified Version/////////////
-
-
-                         /////////////End of the Modified Version/////////////
 void Restaurant::FillDrawingList() {
 	Queue<Order*>temp;
 	Order* frnt;
@@ -498,21 +379,11 @@ void Restaurant::AddtoDemoQueue(Order *pOrd)
 /// ==> end of DEMO-related function
 //////////////////////////////////////////////////////////////////////////////////////////////
 
-//Noran//We should add 3 functions similar to AddtoDemoQueue
-//Noran//i.e AddToWaitingGO(), AddToWaitingVO() and AddToWaitingNO();
 
-//hala //i made it in one function called ToWaitinglist()
 //the function's responsible of choosing the right waiting list 
-//and filling it : if u have any idea to separate them into 3 function tell me to update that
+
 void Restaurant:: ToWaitingList( Order * neworder)
 {
-	/*ORD_TYPE type = arrevent->GetOrdType();
-	int id=arrevent->getOrderID();
-	int etime=arrevent->getEventTime();
-	int size=arrevent->GetOrdSize();
-double money=arrevent->GetOrdMoney();
- Order* neworder = new Order(id,type,WAIT,money,size,etime); 
- delete arrevent; */
 
 ORD_TYPE type=	neworder->GetType();
 switch (type) {

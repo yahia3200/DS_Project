@@ -36,7 +36,7 @@ private:
 	//this will instatnly be changed once we have a priority queue
 	//but just for the time being to test simulating function
 	Queue<Order*> Drawing;   //hala//added to point to all orders//to be used in filldrawinglist function
-	Queue<Order*> Waiting_VO;// menna//i changed it to priorityQueue
+	PriorityQueue<Order*> Waiting_VO;// menna//i changed it to priorityQueue
 
 	Queue<Cook*> Available_NC; //Available Normal Cooks List
 	Queue<Cook*> Available_GC; //Available Vegan Cooks List
@@ -76,7 +76,7 @@ public:
 	void ExecuteEvents(int TimeStep);	//executes all events at current timestep
 	void RunSimulation();
 
-	ORD_TYPE PriorityDrawing(int& VoTime, int& NoTime, int& GoTime);
+	
 
 	void FillDrawingList();
 

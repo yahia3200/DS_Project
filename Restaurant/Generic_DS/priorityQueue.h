@@ -70,7 +70,7 @@ class PriorityQueue
 	{
 		if (subroot == NULL)
 			subroot = new TNode<T>(item);
-		else if (subroot < item)
+		else if (subroot->getitem() < item)
 		{
 			insert(subroot->getright(),item);
 		}

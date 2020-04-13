@@ -119,10 +119,10 @@ bool Order::operator>(const Order& O2)
 	}
 	else if (status == SRV)
 	{
-		if (FinishTime < O2.FinishTime)
-			return true;
-		else
+		if (FinishTime == O2.FinishTime)
 			return (ServTime < O2.ServTime);
+		else
+			return (FinishTime<O2.FinishTime);
 	}
 	
 	// just any valid comparison
