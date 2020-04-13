@@ -108,20 +108,20 @@
     <ClInclude Include="Rest\Cook.h">
       <Filter>Restaurant</Filter>
     </ClInclude>
-    <ClInclude Include="Generic_DS\LinkedList.h">
-      <Filter>Generic_DS</Filter>
-    </ClInclude>
-    <ClInclude Include="Generic_DS\TNode.h">
-      <Filter>Generic_DS</Filter>
-    </ClInclude>
-    <ClInclude Include="Generic_DS\priorityQueue.h">
-      <Filter>Generic_DS</Filter>
+    <ClInclude Include="Events\CancelEvent.h">
+      <Filter>Restaurant</Filter>
     </ClInclude>
     <ClInclude Include="Events\PromoteEvent.h">
-      <Filter>Events</Filter>
+      <Filter>Restaurant</Filter>
     </ClInclude>
-    <ClInclude Include="Events\CancelEvent.h">
-      <Filter>Events</Filter>
+    <ClInclude Include="Generic_DS\LinkedList.h">
+      <Filter>Restaurant</Filter>
+    </ClInclude>
+    <ClInclude Include="Generic_DS\priorityQueue.h">
+      <Filter>Restaurant</Filter>
+    </ClInclude>
+    <ClInclude Include="Generic_DS\TNode.h">
+      <Filter>Restaurant</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -249,12 +249,8 @@
     <ClCompile Include="Rest\Cook.cpp">
       <Filter>Restaurant</Filter>
     </ClCompile>
-    <ClCompile Include="Events\CancelEvent.cpp">
-      <Filter>Events</Filter>
-    </ClCompile>
-    <ClCompile Include="Events\PromoteEvent.cpp">
-      <Filter>Events</Filter>
-    </ClCompile>
+    <ClCompile Include="Events\CancelEvent.cpp" />
+    <ClCompile Include="Events\PromoteEvent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="CMUgraphicsLib\Manual.txt">
@@ -263,5 +259,6 @@
     <Text Include="CMUgraphicsLib\Readme.txt">
       <Filter>CMUGraphicsLib</Filter>
     </Text>
+    <Text Include="InFile.txt" />
   </ItemGroup>
 </Project>
