@@ -17,6 +17,7 @@ int ArrivalEvent::GetOrdSize() {
 double ArrivalEvent :: GetOrdMoney() {
 	return OrdMoney;
 }
+
 ArrivalEvent::ArrivalEvent(ORD_TYPE oType, int eTime, int oID, int oSize, double oMoney) :Event(eTime, oID)
 {
 	OrdType = oType;

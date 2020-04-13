@@ -93,6 +93,8 @@ public:
 	//this function changes an arrival event to an order 
 	//it places it in the appropriate waiting list 
 	void ToWaitingList (Order * neworder);
+
+	bool RemoveFromWaiting_NO(Order* dOrder);
 	
 
 /// ===================    DEMO-related functions. Should be removed in phases 1&2   ================= 

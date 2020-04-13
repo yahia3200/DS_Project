@@ -515,18 +515,29 @@ double money=arrevent->GetOrdMoney();
  delete arrevent; */
 
 ORD_TYPE type=	neworder->GetType();
-switch (type) {
-case  TYPE_NRM:
-	Waiting_NO.insertEnd(neworder);
-	break;
-case TYPE_VGAN:
-	Waiting_GO.enqueue(neworder);
-	break;
-case TYPE_VIP:
-	Waiting_VO.enqueue(neworder);
-	break;
+	switch (type)
+	{
+
+	case  TYPE_NRM:
+		Waiting_NO.insertEnd(neworder);
+		break;
+	case TYPE_VGAN:
+		Waiting_GO.enqueue(neworder);
+		break;
+	case TYPE_VIP:
+		Waiting_VO.enqueue(neworder);
+		break;
+
+	}
+
+	neworder->setStatus(WAIT);
+	Drawing.enqueue(neworder);
 }
-neworder->setStatus(WAIT);
-Drawing.enqueue(neworder);
+
+bool Restaurant::RemoveFromWaiting_NO(Order* dOrder)
+{
+	return Waiting_NO.deleteNode(dOrder);
 }
+
+
 
