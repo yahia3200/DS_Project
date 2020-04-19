@@ -269,9 +269,6 @@ void GUI::ResetDrawingList()
 	DrawingItemsCount = 0;
 }
 
- 
-
-
 PROG_MODE	GUI::getGUIMode() const
 {
 	PROG_MODE Mode;

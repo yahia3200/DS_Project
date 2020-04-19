@@ -29,6 +29,8 @@ public:
 	int GetID();
 
 	ORD_TYPE GetType() const;
+	void SetType(ORD_TYPE);
+
 
 	void setStatus(ORD_STATUS s);
 	ORD_STATUS getStatus() const;

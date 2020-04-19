@@ -14,7 +14,7 @@ class PriorityQueue
 	{
 		TNode<T>* Rptr = Root;
 		if (root == NULL) return root;
-		if (Root == value) //in case the node to be deleted is the root 
+		if (*Root == *value) //in case the node to be deleted is the root 
 		{
 			remove = Root;
 			if (!Root->getleft()) Root = Root->getright();
@@ -25,9 +25,9 @@ class PriorityQueue
 			}
 			return Root;
 		}
-		if (root > value)
+		if (*root > *value)
 			root->setleft(DeleteNode(root->getleft(), value, remove));
-		else if (value > root)
+		else if (*value > *root)
 			root->setright(DeleteNode(root->getright(), value, remove));
 
 		else // if value is same as root's priority, then This is the node to be deleted 
@@ -70,13 +70,14 @@ class PriorityQueue
 	{
 		if (subroot == NULL)
 			subroot = new TNode<T>(item);
-		else if (subroot->getitem() < item)
+		else if (*(subroot->getitem()) > *item)
 		{
-			insert(subroot->getright(),item);
+			insert(subroot->getleft(), item);
+			
 		}
 		else
 		{
-			insert(subroot->getleft(), item);
+			insert(subroot->getright(), item);
 		}
 	}
 
@@ -86,8 +87,8 @@ class PriorityQueue
 		TNode<T>* max = subroot;
 		TNode<T>* Lmax = rec_max(subroot->getleft());
 		TNode<T>* Rmax = rec_max(subroot->getright());
-		if (Lmax && Lmax > max)  max = Lmax;
-		if (Rmax && Rmax > max)  max = Rmax;
+		if (Lmax && *Lmax > *max)  max = Lmax;
+		if (Rmax && *Rmax > *max)  max = Rmax;
 		//cout << max << endl;
 		return max;
 	}
@@ -95,7 +96,7 @@ class PriorityQueue
 	{
 		if (Root == nullptr) { cout << "NULL"; return; }
 		if (subroot == nullptr) { return; }
-		cout << subroot->getitem() << "  ";
+		cout << subroot->getitem()->GetID() << "  ";
 		preorder(subroot->getleft());
 		preorder(subroot->getright());
 	}
@@ -159,7 +160,6 @@ void PriorityQueue<T>::enqueue(T item)
 {
 	count++;
 	insert(Root, item);
-
 }
 template<typename T>
 TNode<T>* PriorityQueue<T>::dequeue()

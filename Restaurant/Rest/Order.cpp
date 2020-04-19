@@ -30,6 +30,11 @@ ORD_TYPE Order::GetType() const
 	return type;
 }
 
+void Order::SetType(ORD_TYPE t)
+{
+	type = t;
+}
+
 
 void Order::setStatus(ORD_STATUS s)
 {

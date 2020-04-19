@@ -35,7 +35,7 @@ private:
 	//hala // will temporary create a queue for the V orders Named Waition_VO//VO for VIP orders
 	//this will instatnly be changed once we have a priority queue
 	//but just for the time being to test simulating function
-	Queue<Order*> Drawing;   //hala//added to point to all orders//to be used in filldrawinglist function
+	LinkedList<Order*> Drawing;   //hala//added to point to all orders//to be used in filldrawinglist function
 	PriorityQueue<Order*> Waiting_VO;// menna//i changed it to priorityQueue
 
 	Queue<Cook*> Available_NC; //Available Normal Cooks List
@@ -94,8 +94,9 @@ public:
 	//it places it in the appropriate waiting list 
 	void ToWaitingList (Order * neworder);
 
-	bool RemoveFromWaiting_NO(Order* dOrder);
-	
+	Order* RemoveFromWaiting_NO(Order* dOrder);
+	void RemoveFromDrawing(Order*);
+	void ToVIP(Order*);
 
 /// ===================    DEMO-related functions. Should be removed in phases 1&2   ================= 
 

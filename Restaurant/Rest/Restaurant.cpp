@@ -65,12 +65,17 @@ Restaurant::~Restaurant()
 void Restaurant::FillDrawingList() {
 	Queue<Order*>temp;
 	Order* frnt;
-	while (Drawing.dequeue(frnt)) {
+
+	frnt = Drawing.Remove_Head();
+
+	while (frnt)
+	{
 		temp.enqueue(frnt);
 		pGUI->AddToDrawingList(frnt);
+		frnt = Drawing.Remove_Head();
 	}
 	while (temp.dequeue(frnt)) {
-		Drawing.enqueue(frnt);
+		Drawing.insertEnd(frnt);
 	}
 
 	///////////////////////for cooks this will present each type of cook after each other/////////////////
@@ -402,12 +407,22 @@ ORD_TYPE type=	neworder->GetType();
 	}
 
 	neworder->setStatus(WAIT);
-	Drawing.enqueue(neworder);
+	Drawing.insertEnd(neworder);
 }
 
-bool Restaurant::RemoveFromWaiting_NO(Order* dOrder)
+Order* Restaurant::RemoveFromWaiting_NO(Order* dOrder)
 {
 	return Waiting_NO.deleteNode(dOrder);
+}
+
+void Restaurant::RemoveFromDrawing(Order* dOrder)
+{
+	Drawing.deleteNode(dOrder);
+}
+
+void Restaurant::ToVIP(Order* ord)
+{
+	Waiting_VO.enqueue(ord);
 }
 
 

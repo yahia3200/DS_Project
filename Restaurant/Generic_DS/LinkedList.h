@@ -17,15 +17,15 @@ public:
 	LinkedList();
 	void insertEnd(const T& newEntry);          //Inserts a new node at the end of the list
 	bool isEmpty();
-	bool deleteNode(const T& theEntry);			//Specifically for deleting a normal order that has been cancelled or promoted
+	T deleteNode(const T& theEntry);			//Specifically for deleting a normal order that has been cancelled or promoted
 	Node<T>* getPrevPointer(const T& theEntry); //returning the node before the required node
 												//i.e the node whose next is the required node
 	void clear();                               //delete all nodes in the list
 
 	void printList();     //To test the linkedlist implementation
 						  //Should be DELETED before delivering phase1
-	//hala //i need getter for head
-	Node<T>*GetHead();
+	
+	T Remove_Head();
 
 
 }; // end Node
@@ -40,8 +40,18 @@ LinkedList<T>::LinkedList()
 }
 
 template<typename T>
-Node<T>* LinkedList<T>::GetHead() {
-	return Head;
+T LinkedList<T>::Remove_Head() 
+{
+	if (!Head)
+		return nullptr;
+
+	T item = Head->getItem();
+
+	Node<T>* temp = Head;
+	Head = Head->getNext();
+	delete temp;
+	count--;
+	return item;
 }
 
 template < typename T>
@@ -56,7 +66,7 @@ Node<T>* LinkedList<T>::getPrevPointer(const T& theEntry)
 	Node<T>* nextTemp = temp->getNext();
 	while (nextTemp)
 	{
-		if (nextTemp->getItem() == theEntry)
+		if (*(nextTemp->getItem()) == *theEntry)
 		{
 			return temp;
 		}
@@ -89,7 +99,7 @@ bool LinkedList<T>::isEmpty()
 }
 
 template < typename T>
-bool LinkedList<T>::deleteNode(const T& requiredEntry)
+T LinkedList<T>::deleteNode(const T& requiredEntry)
 {
 	if (isEmpty())
 	{
@@ -97,10 +107,13 @@ bool LinkedList<T>::deleteNode(const T& requiredEntry)
 	}
 	
 	Node<T>* temp;
+	T item;
 
 	//Incase the requiredEntery is found in the first node
-	if (Head->getItem() == requiredEntry)
+	if (*(Head->getItem()) == *requiredEntry)
 	{
+		item = Head->getItem();
+
 		temp = Head;
 		Head = Head->getNext();
 		delete temp;
@@ -112,7 +125,7 @@ bool LinkedList<T>::deleteNode(const T& requiredEntry)
 			Tail = nullptr;
 		}
 		
-		return true;
+		return item;
 	}
 
 	Node<T>* prevNode = getPrevPointer(requiredEntry);
@@ -121,7 +134,7 @@ bool LinkedList<T>::deleteNode(const T& requiredEntry)
 	//ofcourse there isn't a prevpointer to a not-found Entry
 	if (!prevNode)
 	{
-		return false;
+		return nullptr;
 	}
 
 	Node<T>* requiredNode = prevNode->getNext();
@@ -133,10 +146,12 @@ bool LinkedList<T>::deleteNode(const T& requiredEntry)
 		Tail = prevNode;
 	}
 
+	item = requiredNode->getItem();
+
 	prevNode->setNext(requiredNode->getNext());
 	delete requiredNode;
 	count--;
-	return true;
+	return item;
 }
 
 template < typename T>
