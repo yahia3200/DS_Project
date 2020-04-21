@@ -23,7 +23,7 @@ void ArrivalEvent::Execute(Restaurant* pRest)
 
 	Order* pOrd = new Order(OrderID, OrdType, OrdMoney, OrdSize, EventTime);
 	pRest->ToWaitingList(pOrd);
-	
+	pRest->Middle_Stage(EventTime);
 	///For the sake of demo, this function will just create an order and add it to DemoQueue
 	///Remove the next code lines in phases 1&2
 	//Order* pOrd = new Order(OrderID,OrdType);

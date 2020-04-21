@@ -10,11 +10,14 @@ class PriorityQueue
 {
 	TNode<T>* Root;
 	int count = 0; //number of nodes in the tree
-	TNode<T>* DeleteNode(TNode<T>* root, Node<T>*value, TNode<T>*& remove) //Function to delete node which its priority corresponds to "value"
-	{
-		TNode<T>* Rptr = Root;
+	TNode<T>* DeleteNode(TNode<T>* root, TNode<T>*value, TNode<T>*& remove) //Function to delete node which its priority corresponds to "value"
+	{ 
+		T origin_Root_dta=Root->getitem();
+		T root_item = root->getitem();
+		T value_item = value->getitem();
+
 		if (root == NULL) return root;
-		if (*Root == *value) //in case the node to be deleted is the root 
+		if (*origin_Root_dta == *value_item) //in case the node to be deleted is the root 
 		{
 			remove = Root;
 			if (!Root->getleft()) Root = Root->getright();
@@ -25,9 +28,10 @@ class PriorityQueue
 			}
 			return Root;
 		}
-		if (*root > *value)
+		
+		if (*root_item > *value_item)
 			root->setleft(DeleteNode(root->getleft(), value, remove));
-		else if (*value > *root)
+		else if (*root_item > *value_item)
 			root->setright(DeleteNode(root->getright(), value, remove));
 
 		else // if value is same as root's priority, then This is the node to be deleted 
@@ -85,10 +89,14 @@ class PriorityQueue
 	{
 		if (!subroot) return nullptr;
 		TNode<T>* max = subroot;
+		T Lmax_dta, max_dta, Rmax_dta;
+		if(max)  max_dta = max->getitem();
 		TNode<T>* Lmax = rec_max(subroot->getleft());
 		TNode<T>* Rmax = rec_max(subroot->getright());
-		if (Lmax && *Lmax > *max)  max = Lmax;
-		if (Rmax && *Rmax > *max)  max = Rmax;
+		if (Lmax)  Lmax_dta = Lmax->getitem();
+		if (Rmax)  Rmax_dta = Rmax->getitem();
+		if (Lmax && *Lmax_dta > *max_dta)  max = Lmax;
+		if (Rmax && *Rmax_dta > *max_dta)  max = Rmax;
 		//cout << max << endl;
 		return max;
 	}
@@ -120,11 +128,11 @@ public:
 	TNode<T>* find_max();
 	TNode<T>* find_min();
 	bool isEmpty()const;
-	//bool peekFront()const;
 	void enqueue(T item);
-	T* toArray(int size);
-	TNode<T>* dequeue();
+	T dequeue();//menna//modified the return type to be T*
+	T Peek(); //menna//modified the return type to be T*
 	void Print_preorder();
+
 	~PriorityQueue();
 };
 template<typename T>
@@ -162,15 +170,27 @@ void PriorityQueue<T>::enqueue(T item)
 	insert(Root, item);
 }
 template<typename T>
-TNode<T>* PriorityQueue<T>::dequeue()
+T PriorityQueue<T>::dequeue()
 {
 	TNode<T>* max = find_max();
-
 	TNode<T>* deleted = nullptr;
-	if (!max) return deleted;
+	T deleted_item;
+	if (!max) 
+	{
+		
+		return NULL;
+	}
 	DeleteNode(Root, max, deleted);
 	count--;
-	return deleted;
+	deleted_item = deleted->getitem();
+	return deleted_item;
+}
+template<typename T>
+T PriorityQueue<T>::Peek()
+{
+	TNode<T>* max = find_max();
+	T max_item = max->getitem();
+	return max_item;
 }
 
 template<typename T>
@@ -179,18 +199,6 @@ void PriorityQueue<T>::Print_preorder() // just for testing the implemention
 	preorder(Root);
 }
 
-template<typename T>
-T* PriorityQueue<T>::toArray(int size) 
-
-{
-
-	T* arr = new T[size];
-	for(int i=0;i<size;i++)
-	{
-		arr[i] = find_max();
-	}
-	return arr;
-}
 template<typename T>
 PriorityQueue<T>::~PriorityQueue()
 {

@@ -4,11 +4,13 @@
 Cook::Cook()
 {
 	status = AVAILABLE;
+	currentOrder = nullptr;//menna
 }
 
 
 Cook::~Cook()
 {
+	currentOrder = nullptr;//menna
 }
 
 
@@ -104,12 +106,22 @@ bool Cook::operator>(const Cook& C2)
 {
 	if (status == AVAILABLE)
 	{
-		return (currentOrder->getFinishTime() < C2.currentOrder->getFinishTime());
+		if (!this->currentOrder) return true;
+		if (!C2.currentOrder) return false;
+		else
+		{
+			return (this->currentOrder->getFinishTime() < C2.currentOrder->getFinishTime());
+		}
 	}
 	else if (status == BUSY)
 	{
-		return (currentOrder->getFinishTime() + BREAK <
-									C2.currentOrder->getFinishTime() + C2.breakDuration);
+		if (!this->currentOrder) return true;
+		if (!C2.currentOrder) return false;
+		else
+		{
+			return (this->currentOrder->getFinishTime() + BREAK <
+				C2.currentOrder->getFinishTime() + C2.breakDuration);
+		}
 	}
 
 	// just any valid comparison

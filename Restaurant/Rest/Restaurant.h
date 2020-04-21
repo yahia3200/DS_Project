@@ -36,11 +36,17 @@ private:
 	//this will instatnly be changed once we have a priority queue
 	//but just for the time being to test simulating function
 	LinkedList<Order*> Drawing;   //hala//added to point to all orders//to be used in filldrawinglist function
-	PriorityQueue<Order*> Waiting_VO;// menna//i changed it to priorityQueue
+    PriorityQueue<Order*> Waiting_VO;// menna//i changed it to priorityQueue
+
+	PriorityQueue<Order*> Being_Served; // for all types of orders that are being served orders
+	Queue<Order*> Finshed_orders; // for all types of orders that have been served
 
 	Queue<Cook*> Available_NC; //Available Normal Cooks List
 	Queue<Cook*> Available_GC; //Available Vegan Cooks List
 	Queue<Cook*> Available_VC; //Available VIP Cooks List
+
+	PriorityQueue<Cook*> busy_cooks; // for cooks who have been assigned to order
+	PriorityQueue<Cook*> in_break; // for cooks who in break duration
 
 	//Noran//We will need this in the output file
 	//the number of cooks of different types
@@ -97,6 +103,7 @@ public:
 	Order* RemoveFromWaiting_NO(Order* dOrder);
 	void RemoveFromDrawing(Order*);
 	void ToVIP(Order*);
+	void Middle_Stage(int currtime);
 
 /// ===================    DEMO-related functions. Should be removed in phases 1&2   ================= 
 
