@@ -1,20 +1,35 @@
 #include "Order.h"
-Order::Order()
-{
-}
+
+//Order::Order()
+//{ 
+//}
+
 Order::Order(int id, ORD_TYPE r_Type)
 {
 	ID = (id>0&&id<1000)?id:0;	//1<ID<999
 	type = r_Type;
 	status = WAIT;
+	setWaitingTime(0);
+	setFinishTime(-1);
+	setServTime(-1);
 }
+
 Order::Order(int id, ORD_TYPE r_type, double money, int r_size, int etime) {
 	ID = (id > 0 && id < 1000) ? id : 0;
 	type = r_type;
 	totalMoney = money;
 	orderSize = r_size;
 	ArrTime = etime;
+	status = WAIT;
+	
+	//when the order has just arrived(created), the time it waited is initially 0
+	setWaitingTime(0);   
+
+	//-1 is an itial value indicates it hasnot been assigned to a cook yet
+	setFinishTime(-1);
+	setServTime(-1);
 }
+
 Order::~Order()
 {
 }
@@ -23,7 +38,6 @@ int Order::GetID()
 {
 	return ID;
 }
-
 
 ORD_TYPE Order::GetType() const
 {
@@ -99,8 +113,6 @@ int Order::getFinishTime() const
 void Order::setWaitingTime(int T)
 {
 	WaitingTime = T;
-
-	FinishTime = ArrTime + WaitingTime + ServTime;
 }
 
 int Order::getWaitingTime() const

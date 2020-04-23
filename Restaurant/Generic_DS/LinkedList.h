@@ -24,12 +24,35 @@ public:
 
 	void printList();     //To test the linkedlist implementation
 						  //Should be DELETED before delivering phase1
-	
+	T peekHead();
+
+	T* toArray();
 	T Remove_Head();
+	int getCount() const { return count; }
 
 
 }; // end Node
 
+template < typename T>
+T LinkedList<T>::peekHead()
+{
+	return Head->getItem();
+}
+
+template < typename T>
+T* LinkedList<T>::toArray()
+{
+	if (!Head){ return NULL; }
+
+	T* Array = new T[count];
+	Node<T>* temp = Head;
+	for (int i = 0; i < count;i++)
+	{
+		Array[i] = temp->getItem();
+		temp = temp->getNext();
+	}
+	return Array;
+}
 
 template < typename T>
 LinkedList<T>::LinkedList()
@@ -49,6 +72,9 @@ T LinkedList<T>::Remove_Head()
 
 	Node<T>* temp = Head;
 	Head = Head->getNext();
+
+	if (!Head){ Tail = nullptr; }
+
 	delete temp;
 	count--;
 	return item;
@@ -103,7 +129,7 @@ T LinkedList<T>::deleteNode(const T& requiredEntry)
 {
 	if (isEmpty())
 	{
-		return false;
+		return nullptr;
 	}
 	
 	Node<T>* temp;

@@ -51,82 +51,129 @@ void Restaurant::ExecuteEvents(int CurrentTimeStep)
 	
 }
 //***********************************Middle Stage Functions*****************************
+//This function increments the waiting time for all the orders that haven't been assigned in this timestep
+void Restaurant::increment_Waiting_Time()
+{
+	int GO_Count = 0;
+	
+	if (!Waiting_NO.isEmpty())
+	{
+		Order** NO_Array = Waiting_NO.toArray();
+		for (int i = 0; i < Waiting_NO.getCount(); i++)
+		{
+			NO_Array[i]->setWaitingTime(NO_Array[i]->getWaitingTime() + 1);
+			if (NO_Array[i]->getWaitingTime() == AutoP)
+			{
+				RemoveFromWaiting_NO(NO_Array[i]);
+				NO_Array[i]->SetType(TYPE_VIP);
+				ToVIP(NO_Array[i]);
+				NumOfAutoPNO++;
+			}
+		}
+		delete[] NO_Array;
+	}
+	if (!Waiting_VO.isEmpty())
+	{
+		Order** VO_Array = Waiting_VO.toArray();
+		for (int i = 0; i < Waiting_VO.getCount(); i++)
+		{
+			VO_Array[i]->setWaitingTime(VO_Array[i]->getWaitingTime() + 1);
+		}
+		delete[] VO_Array;
+	}
+	if (!Waiting_GO.isEmpty())
+	{
+		Order** GO_Array = Waiting_GO.toArray(GO_Count);
+		for (int i = 0; i < GO_Count; i++)
+		{
+			GO_Array[i]->setWaitingTime(GO_Array[i]->getWaitingTime() + 1);
+		}
+		delete[] GO_Array;
+	}
+}
+
+bool Restaurant::Assign_To_VC(Order* InSRV_O, Cook* &AC)
+{
+
+	if (!Available_VC.isEmpty())
+	{
+		Available_VC.dequeue(AC); // peeking 
+		AC->setStatus(BUSY); //update the cooker'status to "BUSY"
+		busy_cooks.enqueue(AC); // move the cooker to busy_cooks list
+		AC->setCurrentOrder(InSRV_O); // assign the order to the cooker
+
+		InSRV_O->setStatus(SRV); //update the order status to "serve"
+		return true;
+	}
+	return false;
+}
+
+bool Restaurant::Assign_To_NC(Order* InSRV_O, Cook* &AC)
+{
+
+	if (!Available_NC.isEmpty())
+	{
+		Available_NC.dequeue(AC);
+		AC->setStatus(BUSY);
+		busy_cooks.enqueue(AC);
+		AC->setCurrentOrder(InSRV_O);
+		InSRV_O->setStatus(SRV);
+		return true;
+	}
+	return false;
+}
+
+bool Restaurant::Assign_To_GC(Order* InSRV_O, Cook* &AC)
+{
+
+	if (!Available_GC.isEmpty())
+	{
+		Available_GC.dequeue(AC);
+		AC->setStatus(BUSY);
+		busy_cooks.enqueue(AC);
+		AC->setCurrentOrder(InSRV_O);
+		InSRV_O->setStatus(SRV);
+		return true;
+	}
+	return false;
+}
+
+
 void Restaurant::Middle_Stage(int currtime)
 {
 	Order* InSRV_O;// the order that will be served
 
-	//Order* Inserv_NO;// the normal order that will be served
-	//Order* Inserv_GO;// the vegan order that will be served
-	//**** noran**** i added a seprate inservice order for each type then found no use for them , 
-	//if you agree with me, remove them   *__*
-
 	Cook* AC; // Available cooker for any type
-    
+	
 	//----------------1) for vip order assignment ---------------
-	if (!Waiting_VO.isEmpty())
+	while (!Waiting_VO.isEmpty())
 	{
 		InSRV_O = Waiting_VO.Peek();//peek the highest priority order but without deleting yet
-		if (!Available_VC.isEmpty())
-		{
-			Available_VC.dequeue(AC); // peeking 
-			AC->setStatus(BUSY); //update the cooker'status to "BUSY"
-			busy_cooks.enqueue(AC); // move the cooker to busy_cooks list
-			AC->setCurrentOrder(InSRV_O); // assign the order to the cooker
-			
-			InSRV_O->setStatus(SRV); //update the order status to "serve"
-		}
-	    else if (!Available_NC.isEmpty())
-		{
-			Available_NC.dequeue(AC); 
-			AC->setStatus(BUSY); 
-			busy_cooks.enqueue(AC); 
-			AC->setCurrentOrder(InSRV_O); 
-			InSRV_O->setStatus(SRV);
-			
-		}
-		else if (!Available_GC.isEmpty())
-		{
-			Available_GC.dequeue(AC); 
-			AC->setStatus(BUSY);
-			busy_cooks.enqueue(AC); 
-			AC->setCurrentOrder(InSRV_O);
-			InSRV_O->setStatus(SRV);
-		}
-		if (InSRV_O->getStatus()== SRV) // if order status is turned to serve
+
+		if (Assign_To_VC(InSRV_O, AC) || Assign_To_NC(InSRV_O, AC) || Assign_To_GC(InSRV_O, AC))
 		{
 			Waiting_VO.dequeue();// after confirming the order status == srv , delete it from waiting list
-			int ST = ceil(float(InSRV_O->getOrderSize() / AC->getSpeed())); //calculation of serving time
+			int ST = ceil(float(InSRV_O->getOrderSize()) / AC->getSpeed()); //calculation of serving time
 			InSRV_O->setServTime(ST);
 			int FT = InSRV_O->getArrTime() + InSRV_O->getServTime() + InSRV_O->getWaitingTime();// calculation of finished time
 			InSRV_O->setFinishTime(FT);
 			Being_Served.enqueue(InSRV_O); //move to being served list
-
 		}
 		else
 		{
-			int WT; // the waiting time of the current order
-			WT = InSRV_O->getWaitingTime() + 1;
-			InSRV_O->setWaitingTime(WT);
+			break;
 		}
-		
 	}
+
 	//+++++++++++++++2) for vegan order assignment +++++++++++++++++
-	if (!Waiting_GO.isEmpty())
+	while (!Waiting_GO.isEmpty())
 	{
-		 Waiting_GO.peekFront(InSRV_O);
-	    if (!Available_GC.isEmpty())
-		{
-			Available_GC.dequeue(AC);
-			AC->setStatus(BUSY);
-			busy_cooks.enqueue(AC);
-			AC->setCurrentOrder(InSRV_O);
-			InSRV_O->setStatus(SRV);
-		}
-		if (InSRV_O->getStatus() == SRV) // if order status is turned to serve
+		Waiting_GO.peekFront(InSRV_O);
+		if (Assign_To_GC(InSRV_O, AC))
 		{
 			Order* GO; // just because of the implementation of dequeue function in class Queue
 			Waiting_GO.dequeue(GO);// after confirming the order status == srv , delete it from waiting list
-			int ST = ceil(float(InSRV_O->getOrderSize() / AC->getSpeed())); //calculation of serving time
+			int ST = ceil(float(InSRV_O->getOrderSize()) / AC->getSpeed()); //calculation of serving time
 			InSRV_O->setServTime(ST);
 			int FT = InSRV_O->getArrTime() + InSRV_O->getServTime() + InSRV_O->getWaitingTime();// calculation of finished time
 			InSRV_O->setFinishTime(FT);
@@ -134,26 +181,31 @@ void Restaurant::Middle_Stage(int currtime)
 		}
 		else
 		{
-			int WT; // the waiting time of the current order
-			WT = InSRV_O->getWaitingTime() + 1;
-			InSRV_O->setWaitingTime(WT);
+			break;
 		}
-
 	}
-	//+++++++++++++++2) for Normal order assignment +++++++++++++++++
-	if (!Waiting_NO.isEmpty())
+
+	//+++++++++++++++3) for Normal order assignment +++++++++++++++++
+	while (!Waiting_NO.isEmpty())
 	{
-
-
-		
-
-
-
-
-
-
-
+		InSRV_O = Waiting_NO.peekHead();
+		if (Assign_To_NC(InSRV_O, AC) || Assign_To_VC(InSRV_O, AC))
+		{
+			Waiting_NO.Remove_Head();// after confirming the order status == srv , delete it from waiting list
+			int ST = ceil(float(InSRV_O->getOrderSize()) / AC->getSpeed()); //calculation of serving time
+			InSRV_O->setServTime(ST);
+			int FT = InSRV_O->getArrTime() + InSRV_O->getServTime() + InSRV_O->getWaitingTime();// calculation of finished time
+			InSRV_O->setFinishTime(FT);
+			Being_Served.enqueue(InSRV_O); //move to being served list
+		}
+		else
+		{
+			break;
+		}
 	}
+
+	//this function increments the waiting time for all the orders that haven't been assigned in this timestep
+	increment_Waiting_Time();
 }
 
 
@@ -276,7 +328,7 @@ void Restaurant::LoadFile()
 	i = 0;
 	char EventType;
 	Event* EventPtr;
-	while (!inFile.eof() && i<NumOfEvents)
+	while (i<NumOfEvents)
 	{
 		inFile >> EventType;
 		if (EventType == 'R')
@@ -304,6 +356,7 @@ void Restaurant::LoadFile()
 		{
 			inValidFormat();
 		}
+		i++;
 	}
 
 	inFile.close();
@@ -333,8 +386,6 @@ void Restaurant::inValidFormat()
 	ErrorFile << "Refer to the document to help solve your problem: \n";
 	ErrorFile.close();
 	exit(1);
-
-
 }
 
 
@@ -350,7 +401,15 @@ void Restaurant::SimpleSimulator()
 		itoa(CurrentTimeStep, timestep, 10);
 		pGUI->PrintMessage(timestep);
 		ExecuteEvents(CurrentTimeStep);
+
+		////////////    HAAAALAAAA    /////////////////
+		//Third stage function should be called before middle stage function
+		//for more information call me :")
+
+		//CHECK AL TRTEEB BTA3 L CALLS
+		Middle_Stage(CurrentTimeStep);
 		this->FillDrawingList();
+
 		pGUI->UpdateInterface();
 		Sleep(1000);
 		CurrentTimeStep++;	
@@ -509,7 +568,7 @@ ORD_TYPE type=	neworder->GetType();
 
 	}
 
-	neworder->setStatus(WAIT);
+
 	Drawing.insertEnd(neworder);
 }
 

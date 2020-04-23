@@ -19,7 +19,7 @@ protected:
 
 
 public:
-	Order();//menna// added a default constructure needed for class TNode (copy constructor)
+	//Order();//menna// added a default constructure needed for class TNode (copy constructor)
 	Order(int ID, ORD_TYPE r_Type);
 	//hala// added a constructor to facilitate creating an order object
 	//etime for the arrival time

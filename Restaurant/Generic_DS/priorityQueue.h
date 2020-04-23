@@ -11,8 +11,8 @@ class PriorityQueue
 	TNode<T>* Root;
 	int count = 0; //number of nodes in the tree
 	TNode<T>* DeleteNode(TNode<T>* root, TNode<T>*value, TNode<T>*& remove) //Function to delete node which its priority corresponds to "value"
-	{ 
-		T origin_Root_dta=Root->getitem();
+	{
+		T origin_Root_dta = Root->getitem();
 		T root_item = root->getitem();
 		T value_item = value->getitem();
 
@@ -28,7 +28,7 @@ class PriorityQueue
 			}
 			return Root;
 		}
-		
+
 		if (*root_item > *value_item)
 			root->setleft(DeleteNode(root->getleft(), value, remove));
 		else if (*root_item > *value_item)
@@ -77,7 +77,7 @@ class PriorityQueue
 		else if (*(subroot->getitem()) > *item)
 		{
 			insert(subroot->getleft(), item);
-			
+
 		}
 		else
 		{
@@ -90,7 +90,7 @@ class PriorityQueue
 		if (!subroot) return nullptr;
 		TNode<T>* max = subroot;
 		T Lmax_dta, max_dta, Rmax_dta;
-		if(max)  max_dta = max->getitem();
+		if (max)  max_dta = max->getitem();
 		TNode<T>* Lmax = rec_max(subroot->getleft());
 		TNode<T>* Rmax = rec_max(subroot->getright());
 		if (Lmax)  Lmax_dta = Lmax->getitem();
@@ -121,6 +121,17 @@ class PriorityQueue
 			subroot = nullptr;
 		}
 	}
+	void rec_to_array(TNode<T>* subroot, T*& Array)
+	{
+		static int i = 0;
+		if (!subroot) { return; }
+		else 
+		{
+			Array[i] = subroot->getitem();    i++;
+		}
+		rec_to_array(subroot->getleft(), Array);
+		rec_to_array(subroot->getright(), Array);
+	}
 
 public:
 	PriorityQueue();
@@ -132,7 +143,8 @@ public:
 	T dequeue();//menna//modified the return type to be T*
 	T Peek(); //menna//modified the return type to be T*
 	void Print_preorder();
-
+	T* toArray();
+	int getCount() const { return count; }
 	~PriorityQueue();
 };
 template<typename T>
@@ -175,9 +187,9 @@ T PriorityQueue<T>::dequeue()
 	TNode<T>* max = find_max();
 	TNode<T>* deleted = nullptr;
 	T deleted_item;
-	if (!max) 
+	if (!max)
 	{
-		
+
 		return NULL;
 	}
 	DeleteNode(Root, max, deleted);
@@ -191,6 +203,14 @@ T PriorityQueue<T>::Peek()
 	TNode<T>* max = find_max();
 	T max_item = max->getitem();
 	return max_item;
+}
+template<typename T>
+T* PriorityQueue<T>::toArray()
+{
+	if (!Root){ return NULL; }
+	T* Array = new T[count];
+	rec_to_array(Root, Array);
+	return Array;
 }
 
 template<typename T>
@@ -206,4 +226,3 @@ PriorityQueue<T>::~PriorityQueue()
 	dtree(Root);
 }
 #endif
-				

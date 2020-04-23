@@ -12,10 +12,14 @@ void CancelEvent::Execute(Restaurant* pRest)
 {
 	Order* dOrder = new Order(OrderID, TYPE_NRM);
 
-	pRest->RemoveFromDrawing(dOrder);
-	Order* orgOrfer = pRest->RemoveFromWaiting_NO(dOrder);
+	Order* orgOrder = pRest->RemoveFromWaiting_NO(dOrder);
 
+	//If the order is found and haven't been assigned to a cook yet
+	if (orgOrder)
+	{
+		pRest->RemoveFromDrawing(dOrder);
+		delete orgOrder;
+	}
 	delete dOrder;
-	delete orgOrfer;
 }
 

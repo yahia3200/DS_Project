@@ -189,7 +189,7 @@ T* Queue<T>::toArray(int& count)
 	count=0;
 
 	if(!frontPtr)
-		return nullptr;
+		return NULL;
 	//counting the no. of items in the Queue
 	Node<T>* p = frontPtr;
 	while(p)

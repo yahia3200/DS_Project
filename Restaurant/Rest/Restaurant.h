@@ -23,14 +23,11 @@ private:
 
 	//
 	// TODO: Add More Data Members As Needed
-	//Noran //Add a queue for G orders Named Waiting_GO //GO stands for Vegan Orders
+	//Add a queue for G orders Named Waiting_GO //GO stands for Vegan Orders
 	Queue<Order*> Waiting_GO;	
 
-	//Noran //Add a linkedlist for N orders Named Waiting_NO //NO stands for Normal Orders
+	//Add a linkedlist for N orders Named Waiting_NO //NO stands for Normal Orders
 	LinkedList <Order*> Waiting_NO;
-
-	//Noran //Add a priority queue for V orders Named Waiting_VO //VO stands for VIP Orders
-	//Noran //Need the priority queue implementation
 	
 	//hala // will temporary create a queue for the V orders Named Waition_VO//VO for VIP orders
 	//this will instatnly be changed once we have a priority queue
@@ -48,7 +45,9 @@ private:
 	PriorityQueue<Cook*> busy_cooks; // for cooks who have been assigned to order
 	PriorityQueue<Cook*> in_break; // for cooks who in break duration
 
-	//Noran//We will need this in the output file
+	//We will need this in the output file
+	int NumOfAutoPNO = 0; //Number of autopromoted normal orders
+	
 	//the number of cooks of different types
 	int NumOfNC; //For Noraml Cooks
 	int NumOfGC; //For Vegan Cooks
@@ -64,14 +63,12 @@ private:
 
 	int AutoP; //the number of timesteps after which an order is automatically promoted to VIP.
 	
-	void inValidFormat(); //an error handling object
+	void inValidFormat(); //an error handling function
 
 	/// ==> 
 	//	DEMO-related members. Should be removed in phases 1&2
 	Queue<Order*> DEMO_Queue;	//Important: This is just for demo
 	/// ==>
-	
-	
 	
 	
 public:
@@ -104,6 +101,11 @@ public:
 	void RemoveFromDrawing(Order*);
 	void ToVIP(Order*);
 	void Middle_Stage(int currtime);
+	void increment_Waiting_Time();
+	bool Assign_To_VC(Order*, Cook* &);
+	bool Assign_To_NC(Order*, Cook* &);
+	bool Assign_To_GC(Order*, Cook* &);
+
 
 /// ===================    DEMO-related functions. Should be removed in phases 1&2   ================= 
 
