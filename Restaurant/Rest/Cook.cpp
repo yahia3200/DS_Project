@@ -104,6 +104,7 @@ bool Cook::operator==(const Cook& C2)
 // priority of cooks
 bool Cook::operator>(const Cook& C2)
 {
+	// should be busy
 	if (status == AVAILABLE)
 	{
 		if (!this->currentOrder) return true;
@@ -113,6 +114,8 @@ bool Cook::operator>(const Cook& C2)
 			return (this->currentOrder->getFinishTime() < C2.currentOrder->getFinishTime());
 		}
 	}
+
+	// should be Break
 	else if (status == BUSY)
 	{
 		if (!this->currentOrder) return true;

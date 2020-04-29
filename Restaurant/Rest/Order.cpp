@@ -148,3 +148,8 @@ bool Order::operator>(const Order& O2)
 	return (ArrTime < O2.ArrTime);
 }
 
+bool Order::operator==(const int& id)
+{
+	return ID == id;
+}
+

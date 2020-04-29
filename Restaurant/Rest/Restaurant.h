@@ -97,7 +97,7 @@ public:
 	//it places it in the appropriate waiting list 
 	void ToWaitingList (Order * neworder);
 
-	Order* RemoveFromWaiting_NO(Order* dOrder);
+	Order* RemoveFromWaiting_NO(int id);
 	void RemoveFromDrawing(Order*);
 	void ToVIP(Order*);
 	void Middle_Stage(int currtime);

@@ -55,7 +55,7 @@ public:
 
 	bool operator==(const Order&);
 	bool operator>(const Order&);
-
+	bool operator==(const int&);
 };
 
 #endif

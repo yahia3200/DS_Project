@@ -64,7 +64,8 @@ void Restaurant::increment_Waiting_Time()
 			NO_Array[i]->setWaitingTime(NO_Array[i]->getWaitingTime() + 1);
 			if (NO_Array[i]->getWaitingTime() == AutoP)
 			{
-				RemoveFromWaiting_NO(NO_Array[i]);
+				//RemoveFromWaiting_NO(NO_Array[i]->GetID());
+				Waiting_NO.deleteNode(NO_Array[i]);
 				NO_Array[i]->SetType(TYPE_VIP);
 				ToVIP(NO_Array[i]);
 				NumOfAutoPNO++;
@@ -572,9 +573,14 @@ ORD_TYPE type=	neworder->GetType();
 	Drawing.insertEnd(neworder);
 }
 
-Order* Restaurant::RemoveFromWaiting_NO(Order* dOrder)
+Order* Restaurant::RemoveFromWaiting_NO(int id)
 {
-	return Waiting_NO.deleteNode(dOrder);
+	Order* dOrder = Waiting_NO.get_by_index(id);
+
+	if (dOrder)
+		Waiting_NO.deleteNode(dOrder);
+
+	return dOrder;
 }
 
 void Restaurant::RemoveFromDrawing(Order* dOrder)

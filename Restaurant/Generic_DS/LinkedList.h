@@ -29,7 +29,7 @@ public:
 	T* toArray();
 	T Remove_Head();
 	int getCount() const { return count; }
-
+	T get_by_index(int  index);
 
 }; // end Node
 
@@ -80,6 +80,22 @@ T LinkedList<T>::Remove_Head()
 	return item;
 }
 
+template<typename T>
+ T LinkedList<T>::get_by_index(int index)
+{
+	 Node<T>* ptr = Head;
+
+	 while (ptr)
+	 {
+		 if (*(ptr->getItem()) == index)
+			 return ptr->getItem();
+
+		 ptr = ptr->getNext();
+	 }
+
+	 return nullptr;
+}
+
 template < typename T>
 Node<T>* LinkedList<T>::getPrevPointer(const T& theEntry)
 {
@@ -92,7 +108,7 @@ Node<T>* LinkedList<T>::getPrevPointer(const T& theEntry)
 	Node<T>* nextTemp = temp->getNext();
 	while (nextTemp)
 	{
-		if (*(nextTemp->getItem()) == *theEntry)
+		if (nextTemp->getItem() == theEntry)
 		{
 			return temp;
 		}
@@ -136,7 +152,7 @@ T LinkedList<T>::deleteNode(const T& requiredEntry)
 	T item;
 
 	//Incase the requiredEntery is found in the first node
-	if (*(Head->getItem()) == *requiredEntry)
+	if ( Head->getItem() == requiredEntry)
 	{
 		item = Head->getItem();
 
