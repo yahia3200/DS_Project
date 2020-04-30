@@ -107,14 +107,6 @@ public:
 	bool Assign_To_GC(Order*, Cook* &);
 
 
-/// ===================    DEMO-related functions. Should be removed in phases 1&2   ================= 
-
-	void Just_A_Demo();	//just to show a demo and should be removed in phase1 1 & 2
-	void AddtoDemoQueue(Order* po);	//adds an order to the demo queue
-
-/// ================================================================================================== 
-
-
 
 };
 
