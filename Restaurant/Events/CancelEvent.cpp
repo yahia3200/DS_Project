@@ -18,6 +18,7 @@ void CancelEvent::Execute(Restaurant* pRest)
 	{
 		pRest->RemoveFromDrawing(orgOrder);
 		delete orgOrder;
+		pRest->SetOrdAssigned(pRest->GetOrdAssigned() - 1);
 	}
 	
 }

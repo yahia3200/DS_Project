@@ -5,6 +5,7 @@ Cook::Cook()
 {
 	status = AVAILABLE;
 	currentOrder = nullptr;//menna
+	finishedOrders = 0;
 }
 
 
@@ -91,7 +92,7 @@ void Cook::setEndBreakTime(int t)
 	endBreakTime = t;
 }
 
-int Cook::getEndBreakTime()
+int Cook::getEndBreakTime()const
 {
 	return endBreakTime;
 }
@@ -104,8 +105,8 @@ bool Cook::operator==(const Cook& C2)
 // priority of cooks
 bool Cook::operator>(const Cook& C2)
 {
-	// should be busy
-	if (status == AVAILABLE)
+
+	 if (status == BUSY)
 	{
 		if (!this->currentOrder) return true;
 		if (!C2.currentOrder) return false;
@@ -115,17 +116,15 @@ bool Cook::operator>(const Cook& C2)
 		}
 	}
 
-	// should be Break
-	else if (status == BUSY)
-	{
-		if (!this->currentOrder) return true;
-		if (!C2.currentOrder) return false;
-		else
-		{
-			return (this->currentOrder->getFinishTime() + BREAK <
-				C2.currentOrder->getFinishTime() + C2.breakDuration);
-		}
-	}
+	 else if (status == BREAK) {
+		 if (!this->currentOrder) return true;
+		 if (!C2.currentOrder) return false;
+		 else
+		 {
+			 return (this->getEndBreakTime() <
+				 C2.getEndBreakTime());
+		 }
+	 }
 
 	// just any valid comparison
 	return (speed > C2.speed);

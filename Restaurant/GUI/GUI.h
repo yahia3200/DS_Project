@@ -71,7 +71,7 @@ private:
 		//Max no of orders that can be drawn in a single region
 		MaxRegionOrderCount  = MaxHorizOrders*MaxVerticalOrders;
 		
-		
+	int count, i;
 		
 
 	/////////
@@ -114,7 +114,7 @@ public:
 
 	// Output Functions  ---------------------------
 	void PrintMessage(string msg) const; // prints a message in the status bar
-
+	void PrintSeveral(string msg);
 
 	void UpdateInterface();
 	void AddToDrawingList(Order*pOrd);	//Adds a new order to the drawing queue

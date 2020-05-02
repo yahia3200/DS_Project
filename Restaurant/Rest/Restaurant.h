@@ -62,15 +62,12 @@ private:
 	int BreakOfVC; //the break duration (in timesteps) for VIP cooks
 
 	int AutoP; //the number of timesteps after which an order is automatically promoted to VIP.
-	
+	int Ordassigned=0; //will need this to change the condition of ending the simulation
+	int Finished_VO=0;
+	int Finished_GO = 0;
+	int Finished_NO = 0;
 	void inValidFormat(); //an error handling function
 
-	/// ==> 
-	//	DEMO-related members. Should be removed in phases 1&2
-	Queue<Order*> DEMO_Queue;	//Important: This is just for demo
-	/// ==>
-	
-	
 public:
 	
 	Restaurant();
@@ -91,7 +88,7 @@ public:
 	//i.e N --->0
 	//i.e G --->1
 	//i.e V --->2
-	void SimpleSimulator();
+	void SimpleSimulator(PROG_MODE);
 	//hala //not yet sure if i needed to make it private or not
 	//this function changes an arrival event to an order 
 	//it places it in the appropriate waiting list 
@@ -106,6 +103,13 @@ public:
 	bool Assign_To_NC(Order*, Cook* &);
 	bool Assign_To_GC(Order*, Cook* &);
 
+	void ExitBusyList(Cook*&,int);
+	void ExitBreakList(int);
+	void ToAvailableList(Cook*&);
+	void ThirdStage(int currenttime);
+	void SetOrdAssigned(int);
+	int GetOrdAssigned();  //to be used inside cancel event 
+	void PrintInfo(int);
 
 
 };

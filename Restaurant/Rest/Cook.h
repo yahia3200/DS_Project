@@ -41,7 +41,7 @@ public:
 	Order* getCurrentOrder() const;
 
 	void setEndBreakTime(int);
-	int getEndBreakTime();
+	int getEndBreakTime()const;
 
 	bool operator==(const Cook&);
 	bool operator>(const Cook&);

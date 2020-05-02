@@ -10,65 +10,120 @@ class PriorityQueue
 {
 	TNode<T>* Root;
 	int count = 0; //number of nodes in the tree
-	TNode<T>* DeleteNode(TNode<T>* root, TNode<T>*value, TNode<T>*& remove) //Function to delete node which its priority corresponds to "value"
+	T DeleteNode(const T&Value) //Function to delete node which its priority corresponds to "value"
 	{
-		T origin_Root_dta = Root->getitem();
-		T root_item = root->getitem();
-		T value_item = value->getitem();
+		TNode<T>* del;
+		TNode<T>* delLeft;
+		T delItem;
+		TNode<T>* temp;
 
-		if (root == NULL) return root;
-		if (*origin_Root_dta == *value_item) //in case the node to be deleted is the root 
+		if (Root && Root->getitem() == Value)
 		{
-			remove = Root;
-			if (!Root->getleft()) Root = Root->getright();
-			else if (!Root->getright()) Root = Root->getleft();
-			else if (!Root->getright() && !Root->getleft()) // the tree has only one node (root)
+			del = Root;
+			if (!del->getleft() && !del->getright())
 			{
 				Root = NULL;
 			}
-			return Root;
-		}
-
-		if (*root_item > *value_item)
-			root->setleft(DeleteNode(root->getleft(), value, remove));
-		else if (*root_item > *value_item)
-			root->setright(DeleteNode(root->getright(), value, remove));
-
-		else // if value is same as root's priority, then This is the node to be deleted 
-		{
-
-			if (root->getright() == NULL)
+			else if (!del->getleft())
 			{
-				TNode<T>* target = new TNode<T>(root);
-				remove = target;
-				TNode<T>* temp = root;
-				root = root->getleft();
-				delete temp;
+				Root = del->getright();
 			}
-			else if (root->getleft() == NULL)
+			else if (!del->getright())
 			{
-				TNode<T>* target = new TNode<T>(root);
-				remove = target;
-				TNode<T>* temp = root;
-				root = root->getright();
-				delete temp;
-			}
-			else if (root->getright() == NULL && root->getleft() == NULL)
-			{
-				TNode<T>* target = new TNode<T>(root);
-				remove = target;
-				delete root;
-				root = NULL;
+				Root = del->getleft();
 			}
 			else
 			{
-				TNode<T>* ptr = rec_max(root->getright());
-				root->setitem(ptr->getitem());
-				root->setright(DeleteNode(root->getright(), ptr, remove));
+				delLeft = del->getleft();
+				Root = del->getright();
+				temp = Root;
+				while (temp->getleft())
+				{
+					temp = temp->getleft();
+				}
+				temp->setleft(delLeft);
 			}
+			delItem = del->getitem();
+			delete del;
+			return delItem;
 		}
 
-		return root;
+		temp = Root;
+
+		while (temp && (temp->getleft() || temp->getright()))
+		{
+			if (temp->getleft() && (temp->getleft())->getitem() == Value)
+			{
+				del = temp->getleft();
+
+				if (!del->getleft() && !del->getright())
+				{
+					temp->setleft(NULL);
+				}
+				else if (!del->getleft())
+				{
+					temp->setleft(del->getright());
+				}
+				else if (!del->getright())
+				{
+					temp->setleft(del->getleft());
+				}
+				else
+				{
+					delLeft = del->getleft();
+					temp->setleft(del->getright());
+					while (temp->getleft())
+					{
+						temp = temp->getleft();
+					}
+					temp->setleft(delLeft);
+				}
+				delItem = del->getitem();
+				delete del;
+				return delItem;
+			}
+			else if (temp->getright() && (temp->getright())->getitem() == Value)
+			{
+				del = temp->getright();
+
+				if (!del->getleft() && !del->getright())
+				{
+					temp->setright(NULL);
+				}
+				else if (!del->getleft())
+				{
+					temp->setright(del->getright());
+				}
+				else if (!del->getright())
+				{
+					temp->setright(del->getleft());
+				}
+				else
+				{
+					delLeft = del->getleft();
+					temp->setright(del->getright());
+					temp = del->getright();
+					while (temp->getleft())
+					{
+						temp = temp->getleft();
+					}
+					temp->setleft(delLeft);
+				}
+				delItem = del->getitem();
+				delete del;
+				return delItem;
+			}
+			else if (*(Value) > *(temp->getitem()))
+			{
+				temp = temp->getright();
+			}
+			else
+			{
+				temp = temp->getleft();
+			}
+		}
+		//if it wasnot found
+		return NULL;
 	}
 	void insert(TNode<T>*& subroot, T item) // insert new node based on it's priority
 	{
@@ -88,17 +143,10 @@ class PriorityQueue
 	TNode<T>* rec_max(TNode<T>* subroot) // recursive function to find max priority of the nodes
 	{
 		if (!subroot) return nullptr;
-		TNode<T>* max = subroot;
-		T Lmax_dta, max_dta, Rmax_dta;
-		if (max)  max_dta = max->getitem();
-		TNode<T>* Lmax = rec_max(subroot->getleft());
-		TNode<T>* Rmax = rec_max(subroot->getright());
-		if (Lmax)  Lmax_dta = Lmax->getitem();
-		if (Rmax)  Rmax_dta = Rmax->getitem();
-		if (Lmax && *Lmax_dta > *max_dta)  max = Lmax;
-		if (Rmax && *Rmax_dta > *max_dta)  max = Rmax;
-		//cout << max << endl;
-		return max;
+		while (subroot->getright()) {
+			subroot=subroot->getright();
+		}
+		return subroot;
 	}
 	void preorder(TNode<T>* subroot) // in sequence (root -> left -> right)
 	{
@@ -185,21 +233,17 @@ template<typename T>
 T PriorityQueue<T>::dequeue()
 {
 	TNode<T>* max = find_max();
-	TNode<T>* deleted = nullptr;
-	T deleted_item;
 	if (!max)
 	{
-
 		return NULL;
 	}
-	DeleteNode(Root, max, deleted);
 	count--;
-	deleted_item = deleted->getitem();
-	return deleted_item;
+	return DeleteNode( max->getitem());
 }
 template<typename T>
 T PriorityQueue<T>::Peek()
 {
+	if (isEmpty())return NULL;
 	TNode<T>* max = find_max();
 	T max_item = max->getitem();
 	return max_item;

@@ -24,9 +24,11 @@ void Restaurant::RunSimulation()
 	switch (mode)	//Add a function for each mode in next phases
 	{
 	case MODE_INTR:
+		SimpleSimulator(MODE_INTR);
 		break;
 	case MODE_STEP:
-		SimpleSimulator();
+		SimpleSimulator(MODE_STEP);
+		break;
 	case MODE_SLNT:
 		break;
 	
@@ -100,10 +102,7 @@ bool Restaurant::Assign_To_VC(Order* InSRV_O, Cook* &AC)
 	{
 		Available_VC.dequeue(AC); // peeking 
 		AC->setStatus(BUSY); //update the cooker'status to "BUSY"
-		busy_cooks.enqueue(AC); // move the cooker to busy_cooks list
 		AC->setCurrentOrder(InSRV_O); // assign the order to the cooker
-
-		InSRV_O->setStatus(SRV); //update the order status to "serve"
 		return true;
 	}
 	return false;
@@ -116,9 +115,7 @@ bool Restaurant::Assign_To_NC(Order* InSRV_O, Cook* &AC)
 	{
 		Available_NC.dequeue(AC);
 		AC->setStatus(BUSY);
-		busy_cooks.enqueue(AC);
 		AC->setCurrentOrder(InSRV_O);
-		InSRV_O->setStatus(SRV);
 		return true;
 	}
 	return false;
@@ -131,9 +128,7 @@ bool Restaurant::Assign_To_GC(Order* InSRV_O, Cook* &AC)
 	{
 		Available_GC.dequeue(AC);
 		AC->setStatus(BUSY);
-		busy_cooks.enqueue(AC);
 		AC->setCurrentOrder(InSRV_O);
-		InSRV_O->setStatus(SRV);
 		return true;
 	}
 	return false;
@@ -158,6 +153,8 @@ void Restaurant::Middle_Stage(int currtime)
 			InSRV_O->setServTime(ST);
 			int FT = InSRV_O->getArrTime() + InSRV_O->getServTime() + InSRV_O->getWaitingTime();// calculation of finished time
 			InSRV_O->setFinishTime(FT);
+			busy_cooks.enqueue(AC);
+			InSRV_O->setStatus(SRV);
 			Being_Served.enqueue(InSRV_O); //move to being served list
 		}
 		else
@@ -178,6 +175,8 @@ void Restaurant::Middle_Stage(int currtime)
 			InSRV_O->setServTime(ST);
 			int FT = InSRV_O->getArrTime() + InSRV_O->getServTime() + InSRV_O->getWaitingTime();// calculation of finished time
 			InSRV_O->setFinishTime(FT);
+			busy_cooks.enqueue(AC);
+			InSRV_O->setStatus(SRV);
 			Being_Served.enqueue(InSRV_O); //move to being served list
 		}
 		else
@@ -197,7 +196,10 @@ void Restaurant::Middle_Stage(int currtime)
 			InSRV_O->setServTime(ST);
 			int FT = InSRV_O->getArrTime() + InSRV_O->getServTime() + InSRV_O->getWaitingTime();// calculation of finished time
 			InSRV_O->setFinishTime(FT);
+			busy_cooks.enqueue(AC);
+			InSRV_O->setStatus(SRV);
 			Being_Served.enqueue(InSRV_O); //move to being served list
+		
 		}
 		else
 		{
@@ -338,6 +340,7 @@ void Restaurant::LoadFile()
 			inFile >> oType >> eTime >> oID >> oSize >> oMoney;
 			EventPtr = new ArrivalEvent((ORD_TYPE)(CharToNum(oType)), eTime, oID, oSize, oMoney);
 			EventsQueue.enqueue(EventPtr);
+			Ordassigned++;
 		}
 		else if (EventType == 'X')
 		{
@@ -390,29 +393,23 @@ void Restaurant::inValidFormat()
 }
 
 
-void Restaurant::SimpleSimulator()
+void Restaurant::SimpleSimulator(PROG_MODE mode)
 {
 	int CurrentTimeStep = 1;
 	LoadFile();
-	//the condition of exeting the loop is to be changed later
-	// this is according to the changes made in phase2 
+	//the condition of exeting the loop is to be changed 
 	// with the last order served this will end 
-	while (!EventsQueue.isEmpty()) {
+	while (!EventsQueue.isEmpty() || Ordassigned != Finshed_orders.GetCount()) {
 		char timestep[10];
 		itoa(CurrentTimeStep, timestep, 10);
-		pGUI->PrintMessage(timestep);
 		ExecuteEvents(CurrentTimeStep);
-
-		////////////    HAAAALAAAA    /////////////////
-		//Third stage function should be called before middle stage function
-		//for more information call me :")
-
-		//CHECK AL TRTEEB BTA3 L CALLS
+		ThirdStage(CurrentTimeStep);
 		Middle_Stage(CurrentTimeStep);
 		this->FillDrawingList();
-
+		this->PrintInfo(CurrentTimeStep);
 		pGUI->UpdateInterface();
 		Sleep(1000);
+		if (mode == MODE_STEP) { pGUI->waitForClick(); }
 		CurrentTimeStep++;	
 		pGUI->ResetDrawingList();
 
@@ -422,7 +419,6 @@ void Restaurant::SimpleSimulator()
 	pGUI->waitForClick();
 
 }
-
 //the function's responsible of choosing the right waiting list 
 
 void Restaurant:: ToWaitingList( Order * neworder)
@@ -468,7 +464,99 @@ void Restaurant::ToVIP(Order* ord)
 	Waiting_VO.enqueue(ord);
 }
 
+void Restaurant::ExitBusyList(Cook* &c,int currenttime) {
+	if (c->getStatus() != BUSY)return;
+	c->setFinishedOrders(c->getFinishedOrders() + 1);
+	c->setCurrentOrder(nullptr);
+	//meets the no of  orders before break 
+		if (c->getFinishedOrders() % BO == 0) 
+		{
 
+		busy_cooks.dequeue();
+		c->setStatus(BREAK);
+		c->setEndBreakTime(currenttime + c->getBreakDuration());
+		in_break.enqueue(c);
+	    }
+		else ToAvailableList(c);
+}
 
+void Restaurant::ExitBreakList( int currenttime) {
+	if (in_break.isEmpty())return;
+	Cook* c = in_break.Peek();
+		while (c&&c->getEndBreakTime()==currenttime) 
+		{
+			ToAvailableList(c);
+			c = in_break.Peek();
+	    }
+}
+void Restaurant::ToAvailableList(Cook*& c) {
+	ORD_TYPE type = c->GetType();
+	COOK_STATUS stat=c->getStatus();
+	if (stat == BUSY) {
+		busy_cooks.dequeue();
+	}
+	else if (stat == BREAK) {
+		in_break.dequeue();
+	}
+	switch (type)
+	{
+	case TYPE_NRM:
+		Available_NC.enqueue(c);
+		break;
+	case TYPE_VGAN:
+		Available_GC.enqueue(c);
+		break;
+	case TYPE_VIP:
+		Available_VC.enqueue(c);
+		break;
+	}
+	c->setStatus(AVAILABLE);
 
+}
 
+void Restaurant::ThirdStage(int currenttime) {
+	ExitBreakList(currenttime);
+	Cook * c;
+	Order* ord;
+	
+	ord = Being_Served.Peek();
+	while (ord &&ord->getFinishTime() == currenttime) {
+		Finshed_orders.enqueue(ord);
+		switch (ord->GetType()) {
+		case TYPE_NRM:
+			Finished_NO++;
+			break;
+		case TYPE_VGAN:
+			Finished_GO++;
+			break;
+		case TYPE_VIP:
+			Finished_VO++;
+			break;
+		}
+		ord = Being_Served.dequeue();
+		ord->setStatus(DONE);
+		c = busy_cooks.Peek();
+		ExitBusyList(c, currenttime);
+		ord = Being_Served.Peek();
+	}
+}
+
+void Restaurant::SetOrdAssigned(int s) {
+	Ordassigned = s;
+}
+int Restaurant::GetOrdAssigned() {
+	return Ordassigned;
+}
+void Restaurant::PrintInfo(int currenttime) {
+	pGUI->PrintSeveral("TS :  " + to_string(currenttime));
+	pGUI->PrintSeveral("Waiting _VO:  " + to_string(Waiting_VO.getCount()) +
+					 "  Waiting _GO:  " + to_string(Waiting_GO.GetCount()) +
+					 "  Waiting _N0:  " + to_string(Waiting_NO.getCount()));
+	pGUI->PrintSeveral("Available_VC:  " + to_string(Available_VC.GetCount()) +
+					   "  Available_GC:  " + to_string(Available_GC.GetCount()) +
+					   "  Available_NC " + to_string(Available_NC.GetCount()));
+	pGUI->PrintSeveral("Finished_VO:  " + to_string(Finished_VO) +
+		" Finished_GO:  " + to_string(Finished_GO) +
+		" Finished_NO: " + to_string(Finished_NO));
+
+}

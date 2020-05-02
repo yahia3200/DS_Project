@@ -4,6 +4,8 @@
 GUI::GUI()
 {
 	DrawingItemsCount = 0;
+	count = 1;
+	i = 0;
 	pWind = new window(WindWidth+15,WindHeight,0,0); 
 	pWind->ChangeTitle("The Restautant");
 
@@ -213,6 +215,8 @@ void GUI::DrawAllItems()
 
 void GUI::UpdateInterface() 
 {
+	count = 1;
+	i = 0;
 	ClearDrawingArea();
 	DrawRestArea();
 	DrawAllItems();
@@ -281,4 +285,18 @@ PROG_MODE	GUI::getGUIMode() const
 	while(Mode< 0 || Mode >= MODE_CNT);
 	
 	return Mode;
+}
+
+void GUI::PrintSeveral(string msg) {
+	if (count == 1) {
+		ClearStatusBar();
+		count = 2;
+	}
+	pWind->SetPen(DARKRED);
+	pWind->SetFont(18, BOLD, BY_NAME, "Arial");
+	pWind->DrawString(10 + i, WindHeight - StatusBarHeight + (int)(15 * (count - 1)), msg);
+	if (i == 0) {
+		i = 660;
+	}
+	else { i = 0; 	count++; }
 }
