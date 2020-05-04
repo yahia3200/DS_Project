@@ -77,7 +77,7 @@ public:
 	void RunSimulation();
 	void SimpleSimulator(PROG_MODE);
 	void LoadFile();
-
+	void OutFile();
 	
 	// GUI Functions
 	void FillDrawingList();

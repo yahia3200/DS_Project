@@ -73,7 +73,7 @@ void Restaurant::SimpleSimulator(PROG_MODE mode)
 		pGUI->ResetDrawingList();
 
 	}
-
+	OutFile();
 	pGUI->PrintMessage("generation done, click to END program");
 	pGUI->waitForClick();
 
@@ -186,6 +186,47 @@ void Restaurant::LoadFile()
 	inFile.close();
 
 }
+
+void Restaurant::OutFile()
+{
+	ofstream out;
+	out.open("Output.txt");
+	out << "FT ID AT  WT ST \n";
+	Order* top;
+	float total_wait = 0;
+	float total_serv = 0;
+	int NO = 0, VO = 0, GO = 0;
+	int total_ord = Finshed_orders.GetCount();
+	while (!Finshed_orders.isEmpty()) {
+		Finshed_orders.dequeue(top);
+		total_wait = total_wait + top->getWaitingTime();
+		total_serv = total_serv + top->getServTime();
+		switch (top->GetType()) {
+		case TYPE_NRM:
+			NO++;
+			break;
+		case TYPE_VGAN:
+			GO++;
+			break;
+		case TYPE_VIP:
+			VO++;
+			break;
+		default: 
+			break;
+		}
+
+		out << top->getFinishTime() << " " << top->GetID() << " " << top->getArrTime() << " ";
+		out << top->getWaitingTime() << " " << top->getServTime() << endl;
+		delete top;
+		top = nullptr;
+	}
+	out << "Orders:" <<NO+GO+VO<<" [Norm:"<<NO <<", Veg : "<<GO <<", VIP :" <<VO<< "] "<<endl;
+	out << "Cooks:" << NumOfNC + NumOfGC + NumOfVC << "  [Norm:" << NumOfNC << ", Veg:" << NumOfGC << ", VIP:" << NumOfVC<<" ]"<<endl;
+	out << "Avg Wait =" << total_wait / total_ord << " , Avg Serv =" << total_serv / total_ord << endl;
+	out << "Auto-Promoted :" << NumOfAutoPNO << endl;
+	out.close();
+}
+
 void Restaurant::ExecuteEvents(int CurrentTimeStep)
 {
 	Event* pE;
