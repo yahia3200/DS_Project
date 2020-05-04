@@ -73,44 +73,40 @@ public:
 	Restaurant();
 	~Restaurant();
 	
-	void ExecuteEvents(int TimeStep);	//executes all events at current timestep
+	void ExecuteEvents(int TimeStep);	//Executes ALL events that should take place at current timestep
 	void RunSimulation();
+	void SimpleSimulator(PROG_MODE);
+	void LoadFile();
 
 	
-
+	// GUI Functions
 	void FillDrawingList();
+	void PrintInfo(int);
 
-	//
-	// TODO: Add More Member Functions As Needed
-	//
-	void LoadFile();
+	// Helper Functions
 	int CharToNum(char Type); //This function returns the number corresponding to each type's symbol
-	//i.e N --->0
-	//i.e G --->1
-	//i.e V --->2
-	void SimpleSimulator(PROG_MODE);
-	//hala //not yet sure if i needed to make it private or not
-	//this function changes an arrival event to an order 
-	//it places it in the appropriate waiting list 
-	void ToWaitingList (Order * neworder);
-
+							  //i.e N --->0
+							  //i.e G --->1
+							  //i.e V --->2
+	void ToWaitingList(Order* neworder);//this function changes an arrival event to an order
+										//it places it in the appropriate waiting list 
 	Order* RemoveFromWaiting_NO(int id);
 	void RemoveFromDrawing(Order*);
 	void ToVIP(Order*);
+	void SetOrdAssigned(int);
+	int GetOrdAssigned();  //to be used inside cancel event 
+	
+	// Middle Stage Functions
 	void Middle_Stage(int currtime);
-	void increment_Waiting_Time();
+	void increment_Waiting_Time(); //This function increments the waiting time for all the orders that haven't been assigned in this timestep
 	bool Assign_To_VC(Order*, Cook* &);
 	bool Assign_To_NC(Order*, Cook* &);
 	bool Assign_To_GC(Order*, Cook* &);
 
+	void ThirdStage(int currenttime);
 	void ExitBusyList(Cook*&,int);
 	void ExitBreakList(int);
 	void ToAvailableList(Cook*&);
-	void ThirdStage(int currenttime);
-	void SetOrdAssigned(int);
-	int GetOrdAssigned();  //to be used inside cancel event 
-	void PrintInfo(int);
-
 
 };
 

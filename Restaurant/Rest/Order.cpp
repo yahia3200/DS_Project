@@ -138,9 +138,9 @@ bool Order::operator>(const Order& O2)
 	{
 	
 		if (FinishTime == O2.FinishTime)
-			return (ServTime < O2.ServTime);
+			return (ServTime <= O2.ServTime);
 		else
-			return (FinishTime < O2.FinishTime);
+			return (FinishTime <= O2.FinishTime);
 
 	}
 	

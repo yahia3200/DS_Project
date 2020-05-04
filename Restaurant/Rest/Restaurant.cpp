@@ -15,7 +15,11 @@ Restaurant::Restaurant()
 {
 	pGUI = NULL;
 }
-
+Restaurant::~Restaurant()
+{
+	if (pGUI)
+		delete pGUI;
+}
 void Restaurant::RunSimulation()
 {
 	pGUI = new GUI;
@@ -30,30 +34,309 @@ void Restaurant::RunSimulation()
 		SimpleSimulator(MODE_STEP);
 		break;
 	case MODE_SLNT:
+		SimpleSimulator(MODE_SLNT);
 		break;
 	
 	};
 
 }
-//////////////////////////////////  Event handling functions   /////////////////////////////
+void Restaurant::SimpleSimulator(PROG_MODE mode)
+{
+	int CurrentTimeStep = 1;
+	LoadFile();
+	//the condition of exeting the loop is to be changed 
+	// with the last order served this will end 
+	while (!EventsQueue.isEmpty() || Ordassigned != Finshed_orders.GetCount()) {
+		char timestep[10];
+		itoa(CurrentTimeStep, timestep, 10);
+		ExecuteEvents(CurrentTimeStep);
+		ThirdStage(CurrentTimeStep);
+		Middle_Stage(CurrentTimeStep);
+		this->FillDrawingList();
+		this->PrintInfo(CurrentTimeStep);
+	
+		switch (mode)
+		{
+		case MODE_INTR:
+			pGUI->UpdateInterface();
+			pGUI->waitForClick();
+			break;
+		case MODE_STEP:
+			pGUI->UpdateInterface();
+			Sleep(1000);
+			break;
+		default:
+			break;
+		}
+		
+		CurrentTimeStep++;
+		pGUI->ResetDrawingList();
 
-//Executes ALL events that should take place at current timestep
+	}
+
+	pGUI->PrintMessage("generation done, click to END program");
+	pGUI->waitForClick();
+
+}
+void Restaurant::LoadFile()
+{
+	ifstream inFile("InFile.txt");
+
+	//Handling errors
+	if (!inFile.is_open())
+	{
+		ofstream ErrorFile;
+		ErrorFile.open("Error.txt");
+		ErrorFile << "An Error Occured while opening the input file \n";
+		ErrorFile << "Check the mentioned instructions to help solve your problem: \n";
+		ErrorFile << "-Make sure you are placing the input file in the same directory as the Demo_Main.cpp \n";
+		ErrorFile << "-The file should not be in use \n";
+		ErrorFile.close();
+		exit(1);
+	}
+
+	//Loading Cooks-related data from the i/p file
+	inFile >> NumOfNC >> NumOfGC >> NumOfVC;
+	inFile >> SpeedOfNC >> SpeedOfGC >> SpeedOfVC;
+	inFile >> BO >> BreakOfNC >> BreakOfGC >> BreakOfVC;
+	inFile >> AutoP;
+
+	//Populating cooks lists.
+	Cook* CookPtr;
+	int i = 0;
+	//Populating Normal cooks in their list
+	while (i < NumOfNC)
+	{
+		CookPtr = new Cook;
+		CookPtr->setID(i + 1);
+		CookPtr->setType(TYPE_NRM);
+		CookPtr->setSpeed(SpeedOfNC);
+		CookPtr->setFinishedOrders(0);
+		CookPtr->setBreakDuration(BreakOfNC);
+		Available_NC.enqueue(CookPtr);
+		i++;
+	}
+
+	i = 0;
+	//Populating Vegan cooks in their list
+	while (i < NumOfGC)
+	{
+		CookPtr = new Cook;
+		CookPtr->setID(i + 1 + NumOfNC);
+		CookPtr->setType(TYPE_VGAN);
+		CookPtr->setSpeed(SpeedOfGC);
+		CookPtr->setFinishedOrders(0);
+		CookPtr->setBreakDuration(BreakOfGC);
+		Available_GC.enqueue(CookPtr);
+		i++;
+	}
+
+	i = 0;
+	//Populating VIP cooks in their list
+	while (i < NumOfVC)
+	{
+		CookPtr = new Cook;
+		CookPtr->setID(i + 1 + NumOfNC + NumOfGC);
+		CookPtr->setType(TYPE_VIP);
+		CookPtr->setSpeed(SpeedOfVC);
+		CookPtr->setFinishedOrders(0);
+		CookPtr->setBreakDuration(BreakOfVC);
+		Available_VC.enqueue(CookPtr);
+		i++;
+	}
+
+	//Note that the NumOfEvents is the number of lines left in the i/p file
+	inFile >> NumOfEvents;
+
+	i = 0;
+	char EventType;
+	Event* EventPtr;
+	while (i < NumOfEvents)
+	{
+		inFile >> EventType;
+		if (EventType == 'R')
+		{
+			char oType; int eTime; int oID; int oSize; double oMoney;
+			inFile >> oType >> eTime >> oID >> oSize >> oMoney;
+			EventPtr = new ArrivalEvent((ORD_TYPE)(CharToNum(oType)), eTime, oID, oSize, oMoney);
+			EventsQueue.enqueue(EventPtr);
+			Ordassigned++;
+		}
+		else if (EventType == 'X')
+		{
+			int eTime; int oID;
+			inFile >> eTime >> oID;
+			EventPtr = new CancelEvent(eTime, oID);
+			EventsQueue.enqueue(EventPtr);
+		}
+		else if (EventType == 'P')
+		{
+			int eTime; int oID; double oExtraMoney;
+			inFile >> eTime >> oID >> oExtraMoney;
+			EventPtr = new PromoteEvent(eTime, oID, oExtraMoney);
+			EventsQueue.enqueue(EventPtr);
+		}
+		else
+		{
+			inValidFormat();
+		}
+		i++;
+	}
+
+	inFile.close();
+
+}
 void Restaurant::ExecuteEvents(int CurrentTimeStep)
 {
-	Event *pE;
-	while( EventsQueue.peekFront(pE) )	//as long as there are more events
+	Event* pE;
+	while (EventsQueue.peekFront(pE))	//as long as there are more events
 	{
-		if(pE->getEventTime() > CurrentTimeStep )	//no more events at current timestep
+		if (pE->getEventTime() > CurrentTimeStep)	//no more events at current timestep
 			return;
 
 		pE->Execute(this);
 		EventsQueue.dequeue(pE);	//remove event from the queue
 		delete pE;		//deallocate event object from memory
 	}
-	
+
 }
+
+
+//***********************************GUI Functions*****************************
+
+void Restaurant::FillDrawingList()
+{
+	Queue<Order*>temp;
+	Order* frnt;
+
+	frnt = Drawing.Remove_Head();
+
+	while (frnt)
+	{
+		temp.enqueue(frnt);
+		pGUI->AddToDrawingList(frnt);
+		frnt = Drawing.Remove_Head();
+	}
+	while (temp.dequeue(frnt)) {
+		Drawing.insertEnd(frnt);
+	}
+
+	///////////////////////for cooks this will present each type of cook after each other/////////////////
+	int size = 0;
+	Cook** Cook_Array = Available_VC.toArray(size);
+	Cook* pCook;
+	for (int i = 0; i < size; i++)
+	{
+		pCook = Cook_Array[i];
+		pGUI->AddToDrawingList(pCook);
+	}
+	Cook_Array = Available_NC.toArray(size);
+	for (int i = 0; i < size; i++)
+	{
+		pCook = Cook_Array[i];
+		pGUI->AddToDrawingList(pCook);
+	}
+	Cook_Array = Available_GC.toArray(size);
+	for (int i = 0; i < size; i++)
+	{
+		pCook = Cook_Array[i];
+		pGUI->AddToDrawingList(pCook);
+	}
+}
+void Restaurant::PrintInfo(int currenttime) {
+	pGUI->PrintSeveral("TS :  " + to_string(currenttime));
+	pGUI->PrintSeveral("Waiting _VO:  " + to_string(Waiting_VO.getCount()) +
+		"  Waiting _GO:  " + to_string(Waiting_GO.GetCount()) +
+		"  Waiting _N0:  " + to_string(Waiting_NO.getCount()));
+	pGUI->PrintSeveral("Available_VC:  " + to_string(Available_VC.GetCount()) +
+		"  Available_GC:  " + to_string(Available_GC.GetCount()) +
+		"  Available_NC " + to_string(Available_NC.GetCount()));
+	pGUI->PrintSeveral("Finished_VO:  " + to_string(Finished_VO) +
+		" Finished_GO:  " + to_string(Finished_GO) +
+		" Finished_NO: " + to_string(Finished_NO));
+
+}
+
+//***********************************End GUI Functions*****************************
+
+
+//***********************************Helper Functions*****************************
+
+void Restaurant::inValidFormat()
+{
+	ofstream ErrorFile;
+	ErrorFile.open("Error.txt");
+	ErrorFile << "Something is wrong with the input file's format \n ";
+	ErrorFile << "Refer to the document to help solve your problem: \n";
+	ErrorFile.close();
+	exit(1);
+}
+int Restaurant::CharToNum(char Type)
+{
+	switch (Type)
+	{
+	case 'N':
+		return 0;
+	case 'G':
+		return 1;
+	case 'V':
+		return 2;
+	default: // code to be executed if 'Type' doesn't match any valid cases
+		inValidFormat();
+	}
+}
+void Restaurant::ToWaitingList(Order* neworder)
+{
+
+	ORD_TYPE type = neworder->GetType();
+	switch (type)
+	{
+
+	case  TYPE_NRM:
+		Waiting_NO.insertEnd(neworder);
+		break;
+	case TYPE_VGAN:
+		Waiting_GO.enqueue(neworder);
+		break;
+	case TYPE_VIP:
+		Waiting_VO.enqueue(neworder);
+		break;
+
+	}
+
+
+	Drawing.insertEnd(neworder);
+}
+Order* Restaurant::RemoveFromWaiting_NO(int id)
+{
+	Order* dOrder = Waiting_NO.get_by_index(id);
+
+	if (dOrder)
+		Waiting_NO.deleteNode(dOrder);
+
+	return dOrder;
+}
+void Restaurant::RemoveFromDrawing(Order* dOrder)
+{
+	Drawing.deleteNode(dOrder);
+}
+void Restaurant::ToVIP(Order* ord)
+{
+	Waiting_VO.enqueue(ord);
+}
+void Restaurant::SetOrdAssigned(int s) {
+	Ordassigned = s;
+}
+int Restaurant::GetOrdAssigned()
+{
+	return Ordassigned;
+}
+
+//***********************************End Helper Functions*****************************
+
+
 //***********************************Middle Stage Functions*****************************
-//This function increments the waiting time for all the orders that haven't been assigned in this timestep
+
 void Restaurant::increment_Waiting_Time()
 {
 	int GO_Count = 0;
@@ -94,7 +377,6 @@ void Restaurant::increment_Waiting_Time()
 		delete[] GO_Array;
 	}
 }
-
 bool Restaurant::Assign_To_VC(Order* InSRV_O, Cook* &AC)
 {
 
@@ -107,7 +389,6 @@ bool Restaurant::Assign_To_VC(Order* InSRV_O, Cook* &AC)
 	}
 	return false;
 }
-
 bool Restaurant::Assign_To_NC(Order* InSRV_O, Cook* &AC)
 {
 
@@ -120,7 +401,6 @@ bool Restaurant::Assign_To_NC(Order* InSRV_O, Cook* &AC)
 	}
 	return false;
 }
-
 bool Restaurant::Assign_To_GC(Order* InSRV_O, Cook* &AC)
 {
 
@@ -133,8 +413,6 @@ bool Restaurant::Assign_To_GC(Order* InSRV_O, Cook* &AC)
 	}
 	return false;
 }
-
-
 void Restaurant::Middle_Stage(int currtime)
 {
 	Order* InSRV_O;// the order that will be served
@@ -211,258 +489,10 @@ void Restaurant::Middle_Stage(int currtime)
 	increment_Waiting_Time();
 }
 
-
-Restaurant::~Restaurant()
-{
-		if (pGUI)
-			delete pGUI;
-}
+//***********************************End Middle Stage Functions*****************************
 
 
-void Restaurant::FillDrawingList() {
-	Queue<Order*>temp;
-	Order* frnt;
-
-	frnt = Drawing.Remove_Head();
-
-	while (frnt)
-	{
-		temp.enqueue(frnt);
-		pGUI->AddToDrawingList(frnt);
-		frnt = Drawing.Remove_Head();
-	}
-	while (temp.dequeue(frnt)) {
-		Drawing.insertEnd(frnt);
-	}
-
-	///////////////////////for cooks this will present each type of cook after each other/////////////////
-	int size = 0;
-	Cook** Cook_Array = Available_VC.toArray(size);
-	Cook* pCook;
-	for (int i = 0; i < size; i++)
-	{
-		pCook = Cook_Array[i];
-		pGUI->AddToDrawingList(pCook);
-	}
-	Cook_Array = Available_NC.toArray(size);
-	for (int i = 0; i < size; i++)
-	{
-		pCook = Cook_Array[i];
-		pGUI->AddToDrawingList(pCook);
-	}
-	Cook_Array = Available_GC.toArray(size);
-	for (int i = 0; i < size; i++)
-	{
-		pCook = Cook_Array[i];
-		pGUI->AddToDrawingList(pCook);
-	}
-}
-
-void Restaurant::LoadFile()
-{
-	ifstream inFile("InFile.txt");
-	
-	//Handling errors
-	if (!inFile.is_open())
-	{
-		ofstream ErrorFile;
-		ErrorFile.open("Error.txt");
-		ErrorFile << "An Error Occured while opening the input file \n";
-		ErrorFile << "Check the mentioned instructions to help solve your problem: \n";
-		ErrorFile << "-Make sure you are placing the input file in the same directory as the Demo_Main.cpp \n";
-		ErrorFile << "-The file should not be in use \n";
-		ErrorFile.close();
-		exit(1);
-	}
-
-	//Loading Cooks-related data from the i/p file
-	inFile >> NumOfNC >> NumOfGC >> NumOfVC;
-	inFile >> SpeedOfNC >> SpeedOfGC >> SpeedOfVC;
-	inFile >>BO >> BreakOfNC >> BreakOfGC >> BreakOfVC;
-	inFile >> AutoP;
-	
-	//Populating cooks lists.
-	Cook* CookPtr;
-	int i = 0;
-	//Populating Normal cooks in their list
-	while (i<NumOfNC)
-	{
-		CookPtr = new Cook;
-		CookPtr->setID(i + 1);
-		CookPtr->setType(TYPE_NRM);
-		CookPtr->setSpeed(SpeedOfNC);
-		CookPtr->setFinishedOrders(0);
-		CookPtr->setBreakDuration(BreakOfNC);
-		Available_NC.enqueue(CookPtr);
-		i++;
-	}
-	
-	i = 0;
-	//Populating Vegan cooks in their list
-	while (i<NumOfGC)
-	{
-		CookPtr = new Cook;
-		CookPtr->setID(i + 1 + NumOfNC);
-		CookPtr->setType(TYPE_VGAN);
-		CookPtr->setSpeed(SpeedOfGC);
-		CookPtr->setFinishedOrders(0);
-		CookPtr->setBreakDuration(BreakOfGC);
-		Available_GC.enqueue(CookPtr);
-		i++;
-	}
-
-	i = 0;
-	//Populating VIP cooks in their list
-	while (i<NumOfVC)
-	{
-		CookPtr = new Cook;
-		CookPtr->setID(i + 1 + NumOfNC + NumOfGC);
-		CookPtr->setType(TYPE_VIP);
-		CookPtr->setSpeed(SpeedOfVC);
-		CookPtr->setFinishedOrders(0);
-		CookPtr->setBreakDuration(BreakOfVC);
-		Available_VC.enqueue(CookPtr);
-		i++;
-	}
-
-	//Note that the NumOfEvents is the number of lines left in the i/p file
-	inFile >> NumOfEvents;
-
-	i = 0;
-	char EventType;
-	Event* EventPtr;
-	while (i<NumOfEvents)
-	{
-		inFile >> EventType;
-		if (EventType == 'R')
-		{
-			char oType; int eTime; int oID; int oSize; double oMoney;
-			inFile >> oType >> eTime >> oID >> oSize >> oMoney;
-			EventPtr = new ArrivalEvent((ORD_TYPE)(CharToNum(oType)), eTime, oID, oSize, oMoney);
-			EventsQueue.enqueue(EventPtr);
-			Ordassigned++;
-		}
-		else if (EventType == 'X')
-		{
-			int eTime; int oID;
-			inFile >> eTime >> oID;
-			EventPtr = new CancelEvent(eTime, oID);
-			EventsQueue.enqueue(EventPtr);
-		}
-		else if (EventType == 'P')
-		{
-			int eTime; int oID; double oExtraMoney;
-			inFile >> eTime >> oID >> oExtraMoney;
-			EventPtr = new PromoteEvent(eTime, oID, oExtraMoney);
-			EventsQueue.enqueue(EventPtr);
-		}
-		else
-		{
-			inValidFormat();
-		}
-		i++;
-	}
-
-	inFile.close();
-
-}
-
-int Restaurant::CharToNum(char Type)
-{
-	switch (Type)
-	{
-	case 'N': 
-		return 0;
-	case 'G': 
-		return 1;
-	case 'V': 
-		return 2;
-	default: // code to be executed if 'Type' doesn't match any valid cases
-		inValidFormat();
-	}
-}
-
-void Restaurant::inValidFormat()
-{
-	ofstream ErrorFile;
-	ErrorFile.open("Error.txt");
-	ErrorFile << "Something is wrong with the input file's format \n ";
-	ErrorFile << "Refer to the document to help solve your problem: \n";
-	ErrorFile.close();
-	exit(1);
-}
-
-
-void Restaurant::SimpleSimulator(PROG_MODE mode)
-{
-	int CurrentTimeStep = 1;
-	LoadFile();
-	//the condition of exeting the loop is to be changed 
-	// with the last order served this will end 
-	while (!EventsQueue.isEmpty() || Ordassigned != Finshed_orders.GetCount()) {
-		char timestep[10];
-		itoa(CurrentTimeStep, timestep, 10);
-		ExecuteEvents(CurrentTimeStep);
-		ThirdStage(CurrentTimeStep);
-		Middle_Stage(CurrentTimeStep);
-		this->FillDrawingList();
-		this->PrintInfo(CurrentTimeStep);
-		pGUI->UpdateInterface();
-		Sleep(1000);
-		if (mode == MODE_STEP) { pGUI->waitForClick(); }
-		CurrentTimeStep++;	
-		pGUI->ResetDrawingList();
-
-	}
-	
-	pGUI->PrintMessage("generation done, click to END program");
-	pGUI->waitForClick();
-
-}
-//the function's responsible of choosing the right waiting list 
-
-void Restaurant:: ToWaitingList( Order * neworder)
-{
-
-ORD_TYPE type=	neworder->GetType();
-	switch (type)
-	{
-
-	case  TYPE_NRM:
-		Waiting_NO.insertEnd(neworder);
-		break;
-	case TYPE_VGAN:
-		Waiting_GO.enqueue(neworder);
-		break;
-	case TYPE_VIP:
-		Waiting_VO.enqueue(neworder);
-		break;
-
-	}
-
-
-	Drawing.insertEnd(neworder);
-}
-
-Order* Restaurant::RemoveFromWaiting_NO(int id)
-{
-	Order* dOrder = Waiting_NO.get_by_index(id);
-
-	if (dOrder)
-		Waiting_NO.deleteNode(dOrder);
-
-	return dOrder;
-}
-
-void Restaurant::RemoveFromDrawing(Order* dOrder)
-{
-	Drawing.deleteNode(dOrder);
-}
-
-void Restaurant::ToVIP(Order* ord)
-{
-	Waiting_VO.enqueue(ord);
-}
+//***********************************Third Stage Functions*****************************
 
 void Restaurant::ExitBusyList(Cook* &c,int currenttime) {
 	if (c->getStatus() != BUSY)return;
@@ -479,7 +509,6 @@ void Restaurant::ExitBusyList(Cook* &c,int currenttime) {
 	    }
 		else ToAvailableList(c);
 }
-
 void Restaurant::ExitBreakList( int currenttime) {
 	if (in_break.isEmpty())return;
 	Cook* c = in_break.Peek();
@@ -513,7 +542,6 @@ void Restaurant::ToAvailableList(Cook*& c) {
 	c->setStatus(AVAILABLE);
 
 }
-
 void Restaurant::ThirdStage(int currenttime) {
 	ExitBreakList(currenttime);
 	Cook * c;
@@ -541,22 +569,4 @@ void Restaurant::ThirdStage(int currenttime) {
 	}
 }
 
-void Restaurant::SetOrdAssigned(int s) {
-	Ordassigned = s;
-}
-int Restaurant::GetOrdAssigned() {
-	return Ordassigned;
-}
-void Restaurant::PrintInfo(int currenttime) {
-	pGUI->PrintSeveral("TS :  " + to_string(currenttime));
-	pGUI->PrintSeveral("Waiting _VO:  " + to_string(Waiting_VO.getCount()) +
-					 "  Waiting _GO:  " + to_string(Waiting_GO.GetCount()) +
-					 "  Waiting _N0:  " + to_string(Waiting_NO.getCount()));
-	pGUI->PrintSeveral("Available_VC:  " + to_string(Available_VC.GetCount()) +
-					   "  Available_GC:  " + to_string(Available_GC.GetCount()) +
-					   "  Available_NC " + to_string(Available_NC.GetCount()));
-	pGUI->PrintSeveral("Finished_VO:  " + to_string(Finished_VO) +
-		" Finished_GO:  " + to_string(Finished_GO) +
-		" Finished_NO: " + to_string(Finished_NO));
-
-}
+//***********************************End Third Stage Functions*****************************
