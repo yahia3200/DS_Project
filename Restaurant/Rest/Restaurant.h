@@ -41,7 +41,7 @@ private:
 	Queue<Cook*> Available_NC; //Available Normal Cooks List
 	Queue<Cook*> Available_GC; //Available Vegan Cooks List
 	Queue<Cook*> Available_VC; //Available VIP Cooks List
-
+	Queue<Cook*> Assigned_cook;
 	PriorityQueue<Cook*> busy_cooks; // for cooks who have been assigned to order
 	PriorityQueue<Cook*> in_break; // for cooks who in break duration
 

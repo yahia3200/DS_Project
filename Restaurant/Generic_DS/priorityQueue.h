@@ -140,14 +140,7 @@ class PriorityQueue
 		}
 	}
 
-	TNode<T>* rec_max(TNode<T>* subroot) // recursive function to find max priority of the nodes
-	{
-		if (!subroot) return nullptr;
-		while (subroot->getright()) {
-			subroot=subroot->getright();
-		}
-		return subroot;
-	}
+	
 	void preorder(TNode<T>* subroot) // in sequence (root -> left -> right)
 	{
 		if (Root == nullptr) { cout << "NULL"; return; }
@@ -216,7 +209,12 @@ TNode<T>* PriorityQueue<T>::getroot()const
 template<typename T>
 TNode<T>* PriorityQueue<T>::find_max()
 {
-	return rec_max(this->Root);
+	TNode<T>* subroot = Root;
+	if (!subroot) return nullptr;
+	while (subroot->getright()) {
+		subroot = subroot->getright();
+	}
+	return subroot;
 }
 template<typename T>
 TNode<T>* PriorityQueue<T>::find_min()

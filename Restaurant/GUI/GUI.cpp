@@ -291,8 +291,11 @@ void GUI::PrintSeveral(string msg) {
 	if (count == 1) {
 		ClearStatusBar();
 		count = 2;
+		pWind->SetPen(DARKRED);
 	}
-	pWind->SetPen(DARKRED);
+	else if (count % 2 == 0) { pWind->SetPen(DARKRED); }
+	else { pWind->SetPen(SLATEBLUE); }
+	
 	pWind->SetFont(18, BOLD, BY_NAME, "Arial");
 	pWind->DrawString(10 + i, WindHeight - StatusBarHeight + (int)(15 * (count - 1)), msg);
 	if (i == 0) {

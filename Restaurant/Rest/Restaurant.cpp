@@ -225,6 +225,23 @@ void Restaurant::OutFile()
 	out << "Avg Wait =" << total_wait / total_ord << " , Avg Serv =" << total_serv / total_ord << endl;
 	out << "Auto-Promoted :" << NumOfAutoPNO << endl;
 	out.close();
+	Cook* frnt;
+	while (Available_GC.dequeue(frnt)) {
+		delete frnt;
+		frnt = nullptr;
+	}
+	while (Available_NC.dequeue(frnt)) {
+		delete frnt;
+		frnt = nullptr;
+	}
+	while (Available_VC.dequeue(frnt)) {
+		delete frnt;
+		frnt = nullptr;
+	}
+	while (frnt=in_break.dequeue()) {
+		delete frnt;
+		frnt = nullptr;
+	}
 }
 
 void Restaurant::ExecuteEvents(int CurrentTimeStep)
@@ -295,6 +312,21 @@ void Restaurant::PrintInfo(int currenttime) {
 	pGUI->PrintSeveral("Finished_VO:  " + to_string(Finished_VO) +
 		" Finished_GO:  " + to_string(Finished_GO) +
 		" Finished_NO: " + to_string(Finished_NO));
+	Cook* top;
+	char cook_type;
+	char ord_type;
+	while (Assigned_cook.dequeue(top)) {
+		if (top->GetType() == TYPE_VGAN) { cook_type = 'G'; }
+		else if (top->GetType() == TYPE_NRM) { cook_type = 'N'; }
+		else { cook_type = 'V'; }
+		if (top->getCurrentOrder()->GetType() == TYPE_VGAN) { ord_type = 'G'; }
+		else if (top->getCurrentOrder()->GetType() == TYPE_NRM) { ord_type = 'N'; }
+		else { ord_type = 'V'; }
+
+		pGUI->PrintSeveral(cook_type + to_string(top->GetID()) + " ( "
+			+ord_type + to_string(top->getCurrentOrder()->GetID())
+			+ " )");
+	}
 
 }
 
@@ -426,6 +458,7 @@ bool Restaurant::Assign_To_VC(Order* InSRV_O, Cook* &AC)
 		Available_VC.dequeue(AC); // peeking 
 		AC->setStatus(BUSY); //update the cooker'status to "BUSY"
 		AC->setCurrentOrder(InSRV_O); // assign the order to the cooker
+		Assigned_cook.enqueue(AC);
 		return true;
 	}
 	return false;
@@ -438,6 +471,7 @@ bool Restaurant::Assign_To_NC(Order* InSRV_O, Cook* &AC)
 		Available_NC.dequeue(AC);
 		AC->setStatus(BUSY);
 		AC->setCurrentOrder(InSRV_O);
+		Assigned_cook.enqueue(AC);
 		return true;
 	}
 	return false;
@@ -450,6 +484,7 @@ bool Restaurant::Assign_To_GC(Order* InSRV_O, Cook* &AC)
 		Available_GC.dequeue(AC);
 		AC->setStatus(BUSY);
 		AC->setCurrentOrder(InSRV_O);
+		Assigned_cook.enqueue(AC);
 		return true;
 	}
 	return false;
