@@ -77,6 +77,16 @@ int Cook::getBreakDuration() const
 	return breakDuration;
 }
 
+void Cook::setRestperiod(int d)
+{
+	rst_prd = d;
+}
+
+int Cook::getRestperiod() const
+{
+	return rst_prd;
+}
+
 void Cook::setCurrentOrder(Order* O)
 {
 	currentOrder = O;

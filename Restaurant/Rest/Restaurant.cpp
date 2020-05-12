@@ -97,9 +97,10 @@ void Restaurant::LoadFile()
 
 	//Loading Cooks-related data from the i/p file
 	inFile >> NumOfNC >> NumOfGC >> NumOfVC;
-	inFile >> SpeedOfNC >> SpeedOfGC >> SpeedOfVC;
-	inFile >> BO >> BreakOfNC >> BreakOfGC >> BreakOfVC;
-	inFile >> AutoP;
+	inFile >> SN_min >> SN_max >> SG_min >> SG_max >> SV_min >> SV_max;
+	inFile >> BO >> BN_min >> BN_max >> BG_min >> BG_max >> BV_min >> BV_max;
+	inFile >> InjProp >> RstPrd;
+	inFile >> AutoP >> VIP_WT;
 
 	//Populating cooks lists.
 	Cook* CookPtr;
@@ -110,9 +111,10 @@ void Restaurant::LoadFile()
 		CookPtr = new Cook;
 		CookPtr->setID(i + 1);
 		CookPtr->setType(TYPE_NRM);
-		CookPtr->setSpeed(SpeedOfNC);
+		CookPtr->setSpeed((rand() % SN_max + SN_min));
 		CookPtr->setFinishedOrders(0);
-		CookPtr->setBreakDuration(BreakOfNC);
+		CookPtr->setBreakDuration((rand() % BN_max + BN_min));
+		CookPtr->setRestperiod(RstPrd);
 		Available_NC.enqueue(CookPtr);
 		i++;
 	}
@@ -124,9 +126,10 @@ void Restaurant::LoadFile()
 		CookPtr = new Cook;
 		CookPtr->setID(i + 1 + NumOfNC);
 		CookPtr->setType(TYPE_VGAN);
-		CookPtr->setSpeed(SpeedOfGC);
+		CookPtr->setSpeed((rand() % SG_max + SG_min));
 		CookPtr->setFinishedOrders(0);
-		CookPtr->setBreakDuration(BreakOfGC);
+		CookPtr->setBreakDuration((rand() % BG_max + BG_min));
+		CookPtr->setRestperiod(RstPrd);
 		Available_GC.enqueue(CookPtr);
 		i++;
 	}
@@ -138,9 +141,10 @@ void Restaurant::LoadFile()
 		CookPtr = new Cook;
 		CookPtr->setID(i + 1 + NumOfNC + NumOfGC);
 		CookPtr->setType(TYPE_VIP);
-		CookPtr->setSpeed(SpeedOfVC);
+		CookPtr->setSpeed((rand() % SV_max + SV_min));
 		CookPtr->setFinishedOrders(0);
-		CookPtr->setBreakDuration(BreakOfVC);
+		CookPtr->setBreakDuration((rand() % BV_max + BV_min));
+		CookPtr->setRestperiod(RstPrd);
 		Available_VC.enqueue(CookPtr);
 		i++;
 	}
@@ -491,10 +495,23 @@ bool Restaurant::Assign_To_GC(Order* InSRV_O, Cook* &AC)
 }
 void Restaurant::Middle_Stage(int currtime)
 {
+	float R;// Random number expresses the possibility of injury
+
 	Order* InSRV_O;// the order that will be served
 
 	Cook* AC; // Available cooker for any type
-	
+	//****************************injury ************************
+	Cook* injuredC;
+	R = float(rand() % 10 + 0) / 10;
+
+	if (R <= InjProp)
+	{
+		//injuredC=busy_cooks.dequeue();
+		injuredC->setStatus(INJURED);
+		injuredC->setSpeed(injuredC->getSpeed() / 2);
+		in_rest.enqueue(injuredC);
+	}
+	//*******************************************************************
 	//----------------1) for vip order assignment ---------------
 	while (!Waiting_VO.isEmpty())
 	{
@@ -594,6 +611,17 @@ void Restaurant::ExitBreakList( int currenttime) {
 			c = in_break.Peek();
 	    }
 }
+void Restaurant::ExitRestList(int currenttime) {
+	if (in_rest.isEmpty())return;
+	Cook* c;
+	in_rest.peekFront(c);
+	while (c && c->getRestperiod() == currenttime)
+	{
+		c->setSpeed(c->getSpeed() * 2);
+		ToAvailableList(c);
+	    in_rest.peekFront(c);
+	}
+}
 void Restaurant::ToAvailableList(Cook*& c) {
 	ORD_TYPE type = c->GetType();
 	COOK_STATUS stat=c->getStatus();
@@ -602,6 +630,10 @@ void Restaurant::ToAvailableList(Cook*& c) {
 	}
 	else if (stat == BREAK) {
 		in_break.dequeue();
+	}
+	else if (stat == INJURED)
+	{
+		in_rest.dequeue(c);
 	}
 	switch (type)
 	{
@@ -620,6 +652,7 @@ void Restaurant::ToAvailableList(Cook*& c) {
 }
 void Restaurant::ThirdStage(int currenttime) {
 	ExitBreakList(currenttime);
+	ExitRestList(currenttime);
 	Cook * c;
 	Order* ord;
 	

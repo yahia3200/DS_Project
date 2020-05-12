@@ -14,6 +14,7 @@ class Cook
 	int breakDuration;  //duration of the break
 	Order* currentOrder; //the order that being survied now by this cook
 	int endBreakTime; // time step at which the break for this cook will end
+	int rst_prd;//Rest Period for medication
 
 public:
 	Cook();
@@ -36,6 +37,9 @@ public:
 
 	void setBreakDuration(int d);
 	int getBreakDuration() const;
+
+	void setRestperiod(int d);
+	int getRestperiod() const;
 
 	void setCurrentOrder(Order*);
 	Order* getCurrentOrder() const;

@@ -44,7 +44,7 @@ private:
 	Queue<Cook*> Assigned_cook;
 	PriorityQueue<Cook*> busy_cooks; // for cooks who have been assigned to order
 	PriorityQueue<Cook*> in_break; // for cooks who in break duration
-
+	Queue<Cook*> in_rest;// for cooks who got injured and took rest for medication care
 	//We will need this in the output file
 	int NumOfAutoPNO = 0; //Number of autopromoted normal orders
 	
@@ -54,14 +54,18 @@ private:
 	int NumOfVC; //For VIP Cooks
 	int NumOfEvents; //Number of Total Events
 	
-	int SpeedOfNC, SpeedOfGC, SpeedOfVC;
+	int SN_min, SN_max; //The speed range(min & max) of normal cooks 
+	int SG_min, SG_max; //The speed range (min & max) of vegan cooks 
+	int SV_min, SV_max;// The speed range (min & max) of VIP cooks 
 
 	int BO; //the number of orders a cook must prepare before taking a break
-	int BreakOfNC; //the break duration (in timesteps) for normal cooks
-	int BreakOfGC; //the break duration (in timesteps) for Vegan cooks
-	int BreakOfVC; //the break duration (in timesteps) for VIP cooks
-
-	int AutoP; //the number of timesteps after which an order is automatically promoted to VIP.
+	int BN_min,BN_max ; //the range of break duration (in timesteps) for normal cooks
+	int BG_min,BG_max ; //the range of the break duration (in timesteps) for Vegan cooks
+	int BV_min,BV_max; //the range of the break duration (in timesteps) for VIP cooks
+	float InjProp;// The probability a busy cook gets injured
+	int RstPrd;// Rest Period for all types
+	int AutoP; //the number of timesteps after which an order is automatically promoted to VIP
+	int VIP_WT;//the number of ticks after which a VIP order is considered urgent
 	int Ordassigned=0; //will need this to change the condition of ending the simulation
 	int Finished_VO=0;
 	int Finished_GO = 0;
@@ -106,6 +110,7 @@ public:
 	void ThirdStage(int currenttime);
 	void ExitBusyList(Cook*&,int);
 	void ExitBreakList(int);
+	void ExitRestList(int);
 	void ToAvailableList(Cook*&);
 
 };
