@@ -507,9 +507,13 @@ void Restaurant::InjureACook(int currtime)
 
 	if (R <= InjProp && !busy_cooks.isEmpty())
 	{
-		injuredC = busy_cooks.dequeue();
-		injuredC_Ord = injuredC->getCurrentOrder();
+		//the dequeue and the enqueue to enter the cook at the correct position after injury
+		//the same will be done with the order assigned to this injured cook (to reEnter the order in its correct position after changing the FT)
 
+		injuredC = busy_cooks.dequeue();
+
+		injuredC_Ord = Being_Served.dequeue(); //
+		
 		int old_true_component_of_SRV_time = currtime - injuredC_Ord->getArrTime() - injuredC_Ord->getWaitingTime(); //The order is being cooked for about
 		int OldSpeed = injuredC->getSpeed(); //The old speed for the cook before injury
 		int Finished_Dishes = old_true_component_of_SRV_time * OldSpeed; //Number of finished dishes untill this time step but not including it 
@@ -523,8 +527,9 @@ void Restaurant::InjureACook(int currtime)
 		int FT = injuredC_Ord->getArrTime() + injuredC_Ord->getServTime() + injuredC_Ord->getWaitingTime();// calculation of finished time
 		injuredC_Ord->setFinishTime(FT);
 
-		//Note that I must enqueue it to the busy cooks with a status of BUSY, inordr to insert it based on the least finised time
+		//Note that I must enqueue it to the busy cooks with a status of BUSY, inorder to insert it based on the least finised time
 		busy_cooks.enqueue(injuredC);
+		Being_Served.enqueue(injuredC_Ord);
 		//This is why we changed the status after the enqueue
 		injuredC->setStatus(INJURED);
 		
@@ -551,8 +556,8 @@ void Restaurant::Middle_Stage(int currtime)
 			InSRV_O->setServTime(ST);
 			int FT = InSRV_O->getArrTime() + InSRV_O->getServTime() + InSRV_O->getWaitingTime();// calculation of finished time
 			InSRV_O->setFinishTime(FT);
-			busy_cooks.enqueue(AC);
 			InSRV_O->setStatus(SRV);
+			busy_cooks.enqueue(AC);
 			Being_Served.enqueue(InSRV_O); //move to being served list
 		}
 		else
@@ -573,8 +578,8 @@ void Restaurant::Middle_Stage(int currtime)
 			InSRV_O->setServTime(ST);
 			int FT = InSRV_O->getArrTime() + InSRV_O->getServTime() + InSRV_O->getWaitingTime();// calculation of finished time
 			InSRV_O->setFinishTime(FT);
-			busy_cooks.enqueue(AC);
 			InSRV_O->setStatus(SRV);
+			busy_cooks.enqueue(AC);
 			Being_Served.enqueue(InSRV_O); //move to being served list
 		}
 		else
@@ -594,8 +599,8 @@ void Restaurant::Middle_Stage(int currtime)
 			InSRV_O->setServTime(ST);
 			int FT = InSRV_O->getArrTime() + InSRV_O->getServTime() + InSRV_O->getWaitingTime();// calculation of finished time
 			InSRV_O->setFinishTime(FT);
-			busy_cooks.enqueue(AC);
 			InSRV_O->setStatus(SRV);
+			busy_cooks.enqueue(AC);
 			Being_Served.enqueue(InSRV_O); //move to being served list
 		
 		}
@@ -697,7 +702,7 @@ void Restaurant::ThirdStage(int currenttime) {
 	Cook * c;
 	Order* ord;
 	
-	ord = Being_Served.Peek();
+	ord = Being_Served.Peek(); //PROBLEM
 	while (ord &&ord->getFinishTime() == currenttime) {
 		Finshed_orders.enqueue(ord);
 		switch (ord->GetType()) {
@@ -712,9 +717,9 @@ void Restaurant::ThirdStage(int currenttime) {
 			break;
 		}
 		ord = Being_Served.dequeue();
-		ord->setStatus(DONE);
 		c = busy_cooks.Peek();
 		ExitBusyList(c, currenttime);
+		ord->setStatus(DONE);
 		ord = Being_Served.Peek();
 	}
 }
