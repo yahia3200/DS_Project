@@ -51,6 +51,7 @@ void Restaurant::SimpleSimulator(PROG_MODE mode)
 		itoa(CurrentTimeStep, timestep, 10);
 		ExecuteEvents(CurrentTimeStep);
 		ThirdStage(CurrentTimeStep);
+		InjureACook(CurrentTimeStep);
 		Middle_Stage(CurrentTimeStep);
 		this->FillDrawingList();
 		this->PrintInfo(CurrentTimeStep);
@@ -81,7 +82,10 @@ void Restaurant::SimpleSimulator(PROG_MODE mode)
 void Restaurant::LoadFile()
 {
 	ifstream inFile("InFile.txt");
-
+	
+	//UnComment this in case you want "random sequence" to be generated for each time you run the program
+	//srand(time(NULL));
+	
 	//Handling errors
 	if (!inFile.is_open())
 	{
@@ -111,9 +115,8 @@ void Restaurant::LoadFile()
 		CookPtr = new Cook;
 		CookPtr->setID(i + 1);
 		CookPtr->setType(TYPE_NRM);
-		CookPtr->setSpeed((rand() % SN_max + SN_min));
-		CookPtr->setFinishedOrders(0);
-		CookPtr->setBreakDuration((rand() % BN_max + BN_min));
+		CookPtr->setSpeed(( rand() % (SN_max - SN_min + 1) ) + SN_min);
+		CookPtr->setBreakDuration((rand() % (BN_max - BN_min + 1)) + BN_min);
 		CookPtr->setRestperiod(RstPrd);
 		Available_NC.enqueue(CookPtr);
 		i++;
@@ -126,9 +129,8 @@ void Restaurant::LoadFile()
 		CookPtr = new Cook;
 		CookPtr->setID(i + 1 + NumOfNC);
 		CookPtr->setType(TYPE_VGAN);
-		CookPtr->setSpeed((rand() % SG_max + SG_min));
-		CookPtr->setFinishedOrders(0);
-		CookPtr->setBreakDuration((rand() % BG_max + BG_min));
+		CookPtr->setSpeed((rand() % (SG_max - SG_min + 1)) + SG_min);
+		CookPtr->setBreakDuration((rand() % (BG_max - BG_min + 1)) + BG_min);
 		CookPtr->setRestperiod(RstPrd);
 		Available_GC.enqueue(CookPtr);
 		i++;
@@ -141,9 +143,8 @@ void Restaurant::LoadFile()
 		CookPtr = new Cook;
 		CookPtr->setID(i + 1 + NumOfNC + NumOfGC);
 		CookPtr->setType(TYPE_VIP);
-		CookPtr->setSpeed((rand() % SV_max + SV_min));
-		CookPtr->setFinishedOrders(0);
-		CookPtr->setBreakDuration((rand() % BV_max + BV_min));
+		CookPtr->setSpeed((rand() % (SV_max - SV_min + 1)) + SV_min);
+		CookPtr->setBreakDuration((rand() % (BV_max - BV_min + 1)) + BV_min);
 		CookPtr->setRestperiod(RstPrd);
 		Available_VC.enqueue(CookPtr);
 		i++;
@@ -493,25 +494,51 @@ bool Restaurant::Assign_To_GC(Order* InSRV_O, Cook* &AC)
 	}
 	return false;
 }
-void Restaurant::Middle_Stage(int currtime)
+
+void Restaurant::InjureACook(int currtime)
 {
 	float R;// Random number expresses the possibility of injury
 
+	//****************************injury ************************
+	Cook* injuredC;
+	Order* injuredC_Ord;
+
+	R = float(rand() % 11) / 10; //Number between (0->10) is generated then divided by 10 (0, 0.1, 0.2, 0.3, ..... 0.9, 1)
+
+	if (R <= InjProp && !busy_cooks.isEmpty())
+	{
+		injuredC = busy_cooks.dequeue();
+		injuredC_Ord = injuredC->getCurrentOrder();
+
+		int old_true_component_of_SRV_time = currtime - injuredC_Ord->getArrTime() - injuredC_Ord->getWaitingTime(); //The order is being cooked for about
+		int OldSpeed = injuredC->getSpeed(); //The old speed for the cook before injury
+		int Finished_Dishes = old_true_component_of_SRV_time * OldSpeed; //Number of finished dishes untill this time step but not including it 
+		int UNFinished_Dishes = (injuredC_Ord->getOrderSize()) - Finished_Dishes;
+
+		injuredC->setSpeed(float(injuredC->getSpeed()) / 2); //a problem with the speed's int division
+		int NewSpeed = injuredC->getSpeed();
+		int new_component_of_SRV_time = ceil(float(UNFinished_Dishes) / NewSpeed); //calculation of the new part of the service time
+		
+		injuredC_Ord->setServTime(old_true_component_of_SRV_time + new_component_of_SRV_time);
+		int FT = injuredC_Ord->getArrTime() + injuredC_Ord->getServTime() + injuredC_Ord->getWaitingTime();// calculation of finished time
+		injuredC_Ord->setFinishTime(FT);
+
+		//Note that I must enqueue it to the busy cooks with a status of BUSY, inordr to insert it based on the least finised time
+		busy_cooks.enqueue(injuredC);
+		//This is why we changed the status after the enqueue
+		injuredC->setStatus(INJURED);
+		
+	}
+	//*******************************************************************
+}
+
+void Restaurant::Middle_Stage(int currtime)
+{
+	
 	Order* InSRV_O;// the order that will be served
 
 	Cook* AC; // Available cooker for any type
-	//****************************injury ************************
-	Cook* injuredC;
-	R = float(rand() % 10 + 0) / 10;
-
-	if (R <= InjProp)
-	{
-		//injuredC=busy_cooks.dequeue();
-		injuredC->setStatus(INJURED);
-		injuredC->setSpeed(injuredC->getSpeed() / 2);
-		in_rest.enqueue(injuredC);
-	}
-	//*******************************************************************
+	
 	//----------------1) for vip order assignment ---------------
 	while (!Waiting_VO.isEmpty())
 	{
@@ -588,19 +615,33 @@ void Restaurant::Middle_Stage(int currtime)
 //***********************************Third Stage Functions*****************************
 
 void Restaurant::ExitBusyList(Cook* &c,int currenttime) {
-	if (c->getStatus() != BUSY)return;
+	
+	//From NORAN to Earth
+	//Should we cover the case of a neither BUSY nor INJURED cook, and tell him to return from this function?
+	//Is there is a possibility for this case to happen?
+	
 	c->setFinishedOrders(c->getFinishedOrders() + 1);
 	c->setCurrentOrder(nullptr);
-	//meets the no of  orders before break 
-		if (c->getFinishedOrders() % BO == 0) 
-		{
 
+	//When an injured cook finishes his order
+	if (c->getStatus() == INJURED)
+	{
+		//Inorder to dequeue the correct cook, the cook should have a status of busy
+		c->setStatus(BUSY);
+		busy_cooks.dequeue();
+		//We should make his's status INJURED so that he can exit the in_rest list correctly
+		c->setStatus(INJURED);
+		in_rest.enqueue(c);
+		c->setEndRestTime(currenttime + (c->getRestperiod()));
+	}
+	else if (c->getFinishedOrders() % BO == 0) //meets the no of  orders before break 
+	{
 		busy_cooks.dequeue();
 		c->setStatus(BREAK);
 		c->setEndBreakTime(currenttime + c->getBreakDuration());
 		in_break.enqueue(c);
-	    }
-		else ToAvailableList(c);
+	}
+	else ToAvailableList(c);
 }
 void Restaurant::ExitBreakList( int currenttime) {
 	if (in_break.isEmpty())return;
@@ -615,7 +656,7 @@ void Restaurant::ExitRestList(int currenttime) {
 	if (in_rest.isEmpty())return;
 	Cook* c;
 	in_rest.peekFront(c);
-	while (c && c->getRestperiod() == currenttime)
+	while (c && c->getEndRestTime() == currenttime)
 	{
 		c->setSpeed(c->getSpeed() * 2);
 		ToAvailableList(c);

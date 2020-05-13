@@ -102,9 +102,19 @@ void Cook::setEndBreakTime(int t)
 	endBreakTime = t;
 }
 
-int Cook::getEndBreakTime()const
+int Cook::getEndBreakTime() const
 {
 	return endBreakTime;
+}
+
+void Cook::setEndRestTime(int r)
+{
+	endRestTime = r;
+}
+
+int Cook::getEndRestTime() const
+{
+	return endRestTime;
 }
 
 bool Cook::operator==(const Cook& C2)

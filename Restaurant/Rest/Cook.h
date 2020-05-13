@@ -14,6 +14,7 @@ class Cook
 	int breakDuration;  //duration of the break
 	Order* currentOrder; //the order that being survied now by this cook
 	int endBreakTime; // time step at which the break for this cook will end
+	int endRestTime; // time step at which the rest for this cook will end
 	int rst_prd;//Rest Period for medication
 
 public:
@@ -46,6 +47,9 @@ public:
 
 	void setEndBreakTime(int);
 	int getEndBreakTime()const;
+
+	void setEndRestTime(int);
+	int getEndRestTime()const;
 
 	bool operator==(const Cook&);
 	bool operator>(const Cook&);

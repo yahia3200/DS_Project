@@ -112,6 +112,7 @@ public:
 	void ExitBreakList(int);
 	void ExitRestList(int);
 	void ToAvailableList(Cook*&);
+	void InjureACook(int currtime);
 
 };
 
