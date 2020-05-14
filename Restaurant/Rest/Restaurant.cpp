@@ -47,8 +47,6 @@ void Restaurant::SimpleSimulator(PROG_MODE mode)
 	//the condition of exeting the loop is to be changed 
 	// with the last order served this will end 
 	while (!EventsQueue.isEmpty() || Ordassigned != Finshed_orders.GetCount()) {
-		char timestep[10];
-		itoa(CurrentTimeStep, timestep, 10);
 		ExecuteEvents(CurrentTimeStep);
 		ThirdStage(CurrentTimeStep);
 		InjureACook(CurrentTimeStep);
@@ -419,10 +417,24 @@ void Restaurant::increment_Waiting_Time()
 {
 	int GO_Count = 0;
 	
+	if (!Waiting_VO.isEmpty())
+	{
+		Order** VO_Array = Waiting_VO.toArray();
+		for (int i = 0; i < Waiting_VO.getCount(); i++)
+		{
+			VO_Array[i]->setWaitingTime(VO_Array[i]->getWaitingTime() + 1);
+		}
+		delete[] VO_Array;
+	}
+	
 	if (!Waiting_NO.isEmpty())
 	{
 		Order** NO_Array = Waiting_NO.toArray();
-		for (int i = 0; i < Waiting_NO.getCount(); i++)
+		//We have to store the Waiting_NO.getCount() in a variable first before using it inside the for's condition
+		//Because if we face an auto promoted order the Waiting_NO.getCount() will decrease by 1,
+		//and the for loop will exited earlier than it should do
+		int NO_Count = Waiting_NO.getCount();
+		for (int i = 0; i < NO_Count; i++)
 		{
 			NO_Array[i]->setWaitingTime(NO_Array[i]->getWaitingTime() + 1);
 			if (NO_Array[i]->getWaitingTime() == AutoP)
@@ -436,15 +448,7 @@ void Restaurant::increment_Waiting_Time()
 		}
 		delete[] NO_Array;
 	}
-	if (!Waiting_VO.isEmpty())
-	{
-		Order** VO_Array = Waiting_VO.toArray();
-		for (int i = 0; i < Waiting_VO.getCount(); i++)
-		{
-			VO_Array[i]->setWaitingTime(VO_Array[i]->getWaitingTime() + 1);
-		}
-		delete[] VO_Array;
-	}
+	
 	if (!Waiting_GO.isEmpty())
 	{
 		Order** GO_Array = Waiting_GO.toArray(GO_Count);
@@ -512,7 +516,7 @@ void Restaurant::InjureACook(int currtime)
 
 		injuredC = busy_cooks.dequeue();
 
-		injuredC_Ord = Being_Served.dequeue(); //
+		injuredC_Ord = Being_Served.dequeue(); 
 		
 		int old_true_component_of_SRV_time = currtime - injuredC_Ord->getArrTime() - injuredC_Ord->getWaitingTime(); //The order is being cooked for about
 		int OldSpeed = injuredC->getSpeed(); //The old speed for the cook before injury
@@ -565,7 +569,7 @@ void Restaurant::Middle_Stage(int currtime)
 			break;
 		}
 	}
-
+	
 	//+++++++++++++++2) for vegan order assignment +++++++++++++++++
 	while (!Waiting_GO.isEmpty())
 	{
@@ -657,17 +661,31 @@ void Restaurant::ExitBreakList( int currenttime) {
 			c = in_break.Peek();
 	    }
 }
-void Restaurant::ExitRestList(int currenttime) {
+
+void Restaurant::ExitRestList(int currenttime) 
+{
 	if (in_rest.isEmpty())return;
 	Cook* c;
 	in_rest.peekFront(c);
 	while (c && c->getEndRestTime() == currenttime)
 	{
 		c->setSpeed(c->getSpeed() * 2);
-		ToAvailableList(c);
-	    in_rest.peekFront(c);
+		if (c->getFinishedOrders() % BO == 0)
+		{
+			//Go to break
+			in_rest.dequeue(c);
+			c->setStatus(BREAK);
+			c->setEndBreakTime(currenttime + c->getBreakDuration());
+			in_break.enqueue(c);
+		}
+		else
+		{
+			ToAvailableList(c);
+		}
+		in_rest.peekFront(c);
 	}
 }
+
 void Restaurant::ToAvailableList(Cook*& c) {
 	ORD_TYPE type = c->GetType();
 	COOK_STATUS stat=c->getStatus();

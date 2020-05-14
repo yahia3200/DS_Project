@@ -162,16 +162,15 @@ class PriorityQueue
 			subroot = nullptr;
 		}
 	}
-	void rec_to_array(TNode<T>* subroot, T*& Array)
+	void rec_to_array(TNode<T>* subroot, T*& Array, int & i)
 	{
-		static int i = 0;
 		if (!subroot) { return; }
 		else 
 		{
 			Array[i] = subroot->getitem();    i++;
 		}
-		rec_to_array(subroot->getleft(), Array);
-		rec_to_array(subroot->getright(), Array);
+		rec_to_array(subroot->getleft(), Array, i);
+		rec_to_array(subroot->getright(), Array, i);
 	}
 
 public:
@@ -250,8 +249,9 @@ template<typename T>
 T* PriorityQueue<T>::toArray()
 {
 	if (!Root){ return NULL; }
+	int i = 0;
 	T* Array = new T[count];
-	rec_to_array(Root, Array);
+	rec_to_array(Root, Array, i);
 	return Array;
 }
 
