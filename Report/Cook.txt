@@ -1,0 +1,333 @@
+GetID
+Member of: Class Cook
+Inputs:
+   Void
+Returns:
+   Returns the Cook ID
+Called By:
+   GUI::AddToDrawingList()
+   Restaurant::PrintInfo()
+Calls:
+   Void
+Function Logic description:
+   Getter for Cook's ID
+
+
+GetType
+Member of: Class Cook
+Inputs:
+   Void
+Returns:
+   Returns the Cook type
+Called By:
+   GUI::AddToDrawingList()
+   Restaurant::PrintInfo()
+Calls:
+   Void
+Function Logic description:
+   Getter for Cook's type
+
+
+setStatus
+Member of: Class Cook
+Inputs:
+   COOK_STATUS
+Returns:
+   Void
+Called By:
+   Restaurant::Assign_To_VC()
+   Restaurant::Assign_To_NC()
+   Restaurant::Assign_To_GC()
+   Restaurant::InjureACook()
+   Restaurant::Middle_Stage()
+   Restaurant::ExitBusyList()
+   Restaurant::ExitRestList()
+   Restaurant::ToAvailableList()
+Calls:
+   Void
+Function Logic description:
+   Setter for Cook's Status
+
+
+
+getStatus
+Member of: Class Cook
+Inputs:
+   Void
+Returns:
+   Returns the Cook Status
+Called By:
+   Restaurant::ExitBusyList()
+   Restaurant::ToAvailableList()
+Calls:
+   Void
+Function Logic description:
+   Getter for Cook's Status
+
+
+setID
+Member of: Class Cook
+Inputs:
+   id: Cook's ID
+Returns:
+   Void
+Called By:
+   Restaurant::LoadFile()
+Calls:
+   Void
+Function Logic description:
+   Setter for Cook's ID
+
+
+setType
+Member of: Class Cook
+Inputs:
+   t: Cook's type
+Returns:
+   Void
+Called By:
+   Restaurant::LoadFile()
+Calls:
+   Void
+Function Logic description:
+   Setter for Cook's type
+
+
+setSpeed
+
+setType
+Member of: Class Cook
+Inputs:
+   s: Cook's speed
+Returns:
+   Void
+Called By:
+   Restaurant::LoadFile()
+   Restaurant::InjureACook()
+   Restaurant::ExitRestList()
+Calls:
+   Void
+Function Logic description:
+   Setter for Cook's speed
+
+
+getSpeed
+Member of: Class Cook
+Inputs:
+   Void
+Returns:
+   Returns the Cook's speed
+Called By:
+   Restaurant::Middle_Stage()
+   Restaurant::InjureACook()
+   Restaurant::ExitRestList()
+Calls:
+   Void
+Function Logic description:
+   Getter for Cook's speed
+
+
+setFinishedOrders
+Member of: Class Cook
+Inputs:
+   orders: number Finished orders by this Cook
+Returns:
+   void
+Called By:
+   Restaurant::ExitBusyList()
+Calls:
+   Void
+Function Logic description:
+   Setter for Finished orders by this Cook
+
+
+getFinishedOrders
+Member of: Class Cook
+Inputs:
+   Void
+Returns:
+   Returns the Finished orders by this Cook
+Called By:
+   Restaurant::ExitBusyList()
+   Restaurant::ExitRestList()
+Calls:
+   Void
+Function Logic description:
+   Getter for Finished orders by this Cook
+
+
+setBreakDuration
+Member of: Class Cook
+Inputs:
+   d: Duration of the Break
+Returns:
+   void
+Called By:
+   Restaurant::LoadFile()
+Calls:
+   Void
+Function Logic description:
+   Setter for Duration of the Break for this Cook
+
+
+getBreakDuration
+Member of: Class Cook
+Inputs:
+   Void
+Returns:
+   Returns the Duration of the Break for this Cook
+Called By:
+   Restaurant::ExitBusyList()
+   Restaurant::ExitRestList()
+Calls:
+   Void
+Function Logic description:
+   Getter for Duration of the Break for this Cook
+
+
+setRestperiod
+Member of: Class Cook
+Inputs:
+   d: Duration of the Rest
+Returns:
+   void
+Called By:
+   Restaurant::LoadFile()
+Calls:
+   Void
+Function Logic description:
+   Setter for Duration of the Rest for this Cook
+
+
+getRestperiod
+Member of: Class Cook
+Inputs:
+   Void
+Returns:
+   Returns the Duration of the Rest for this Cook
+Called By:
+   Restaurant::ExitBusyList()
+Calls:
+   Void
+Function Logic description:
+   Getter for Duration of the Rest for this Cook
+
+
+setCurrentOrder
+Member of: Class Cook
+Inputs:
+   O: Order 
+Returns:
+   void
+Called By:
+   Restaurant::Assign_To_VC()
+   Restaurant::Assign_To_NC()
+   Restaurant::Assign_To_GC()
+   Restaurant::ExitBusyList()
+Calls:
+   Void
+Function Logic description:
+   Setter for Order that is will be served by this Cook
+
+
+getCurrentOrder
+Member of: Class Cook
+Inputs:
+   Void
+Returns:
+   Returns the Current order for this Cook
+Called By:
+   Restaurant::PrintInfo()
+   Cook::operator>()
+Calls:
+   Void
+Function Logic description:
+   Getter for order that was served by this Cook
+
+
+setEndBreakTime
+Member of: Class Cook
+Inputs:
+   t: timestep at which the break for this cook will over 
+Returns:
+   void
+Called By:
+   Restaurant::ExitBusyList()
+   Restaurant::ExitRestList()
+Calls:
+   Void
+Function Logic description:
+   Setter for the end break time for this Cook
+
+
+getEndBreakTime
+Member of: Class Cook
+Inputs:
+   Void
+Returns:
+   Returns the timestep at which the break for this cook will over
+Called By:
+    Restaurant::ExitBreakList()
+    Cook::operator>()
+Calls:
+   Void
+Function Logic description:
+   Getter for the end break time for this Cook
+
+
+setEndRestTime
+Member of: Class Cook
+Inputs:
+   t: timestep at which the Rest for this cook will over 
+Returns:
+   void
+Called By:
+   Restaurant::ExitBusyList()
+Calls:
+   Void
+Function Logic description:
+   Setter for the end break Rest for this Cook
+
+
+getEndRestTime
+Inputs:
+   Void
+Returns:
+   Returns the timestep at which the Rest for this cook will over
+Called By:
+    Restaurant::ExitRestList()
+Calls:
+   Void
+Function Logic description:
+   Getter for the end Rest time for this Cook
+
+
+operator==
+Member of: Class Cook
+Inputs:
+   C2: another cook to compare with
+Returns:
+   Returns if the ID of this cook equal the ID of the other cook
+Called By:
+
+Calls:
+   Void
+Function Logic description:
+   define the == operator for Cook class
+
+
+
+
+operator>
+Member of: Class Cook
+Inputs:
+   C2: another cook to compare with
+Returns:
+   Returns if this cook has heigher priority from the other cook or not
+Called By:
+
+Calls:
+   Order::getFinishTime()
+   Order::getServTime()
+Function Logic description:
+   define priority of cooks (depends on it's status this priority changes)
