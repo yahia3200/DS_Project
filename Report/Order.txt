@@ -1,0 +1,295 @@
+
+GetID
+Member of: Class Order
+Inputs:
+   Void
+Returns:
+   Returns the Order ID
+Called By:
+   GUI::AddToDrawingList()
+    Restaurant::OutFile() 
+   Restaurant::PrintInfo()
+Calls:
+   Void
+Function Logic description:
+   Getter for Order's ID
+
+
+GetType
+Member of: Class Order
+Inputs:
+   Void
+Returns:
+   Returns the Order type
+Called By:
+   GUI::AddToDrawingList(Order * pOrd)
+   Restaurant::PrintInfo(int currenttime)
+   Restaurant::OutFile() 
+   Restaurant::ThirdStage(int currenttime) 
+   Restaurant::ToWaitingList(Order * neworder)
+      
+Calls:
+   Void
+Function Logic description:
+   Getter for Order's type
+
+
+SetType
+Member of: Class Order
+Inputs:
+   ORD_TYPE
+Returns:
+   Void
+Called By:
+   PromoteEvent::Execute(Restaurant * pRest) 
+   Restaurant::increment_Waiting_Time()
+Calls:
+   Void
+Function Logic description:
+   Setter for Order's Type
+
+
+
+setStatus
+Member of: Class Order
+Inputs:
+   ORD_STATUS
+Returns:
+   Void
+Called By:
+   Restaurant::Middle_Stage(int currtime)
+   Restaurant::ThirdStage(int currenttime)
+Calls:
+   Void
+Function Logic description:
+   Setter for Order's Status
+
+
+
+getStatus
+Member of: Class Order
+Inputs:
+   void
+Returns:
+   Returns the Order Status
+Called By:
+   GUI::AddToDrawingList(Order * pOrd)
+Calls:
+   Void
+Function Logic description:
+   Setter for Order's Status
+
+
+
+setTotalMoney
+Member of: Class Order
+Inputs:
+   M: the total money of the order
+Returns:
+   void
+Called By:
+   PromoteEvent::Execute(Restaurant * pRest)
+Calls:
+   Void
+Function Logic description:
+   Setter for Order's total money
+
+
+
+getTotalMoney
+Member of: Class Order
+Inputs:
+   void
+Returns:
+   Returns the Order's total money
+
+Called By:
+   PromoteEvent::Execute(Restaurant * pRest)
+Calls:
+   Void
+Function Logic description:
+   getter for Order's total money
+
+
+
+getOrderSize
+Member of: Class Order
+Inputs:
+   void
+Returns:
+   Returns Order's number of dishes
+Called By:
+   Restaurant::InjureACook(int currtime)
+   Restaurant::Middle_Stage(int currtime)
+Calls:
+   Void
+Function Logic description:
+   getter for Order's Size
+
+
+
+getArrTime
+Member of: Class Order
+Inputs:
+   void
+Returns:
+   Returns time step at which the order arrived
+Called By:
+   Restaurant::InjureACook(int currtime)
+   Restaurant::Middle_Stage(int currtime)
+Calls:
+   Void
+Function Logic description:
+   Getter for Order's arrival time
+
+
+setServTime
+Member of: Class Order
+Inputs:
+   T: number of time steps the order took to be served
+Returns:
+   void
+Called By:
+   Restaurant::InjureACook(int currtime)
+   Restaurant::Middle_Stage(int currtime)
+   Order::Order(int id, ORD_TYPE r_Type)
+   Order::Order(int id, ORD_TYPE r_type, double money, int r_size, int etime) 
+Calls:
+   Void
+Function Logic description:
+   Setter for Order's Serving time
+
+
+
+getServTime
+Member of: Class Order
+Inputs:
+   void
+Returns:
+   Returns number of time steps the order took to be served
+Called By:
+   Restaurant::InjureACook(int currtime)
+   Restaurant::Middle_Stage(int currtime)
+   Restaurant::OutFile()
+   Cook::operator>(const Cook & C2)
+Calls:
+   Void
+Function Logic description:
+   Getter for Order's Serving time
+
+
+setFinishTime
+Member of: Class Order
+Inputs:
+   T: time step at which the Order becomes Ready 
+Returns:
+   void
+Called By:
+   Restaurant::InjureACook(int currtime)
+   Restaurant::Middle_Stage(int currtime)
+   Order::Order(int id, ORD_TYPE r_Type)
+   Order::Order(int id, ORD_TYPE r_type, double money, int r_size, int etime) 
+Calls:
+   Void
+Function Logic description:
+   Setter for Order's Finish time
+
+
+
+getFinishTime
+Member of: Class Order
+Inputs:
+   void  
+Returns:
+   Returns time step at which the Order becomes Ready 
+Called By:
+   Restaurant::OutFile()
+   Restaurant::ThirdStage(int currtime)
+   Cook::operator>(const Cook & C2)
+Calls:
+   Void
+Function Logic description:
+   Getter for Order's Finish time
+
+
+setWaitingTime
+Member of: Class Order
+Inputs:
+   T : number of time steps the order waited for until has been assigned to a cook
+Returns:
+   void
+Called By:
+   Restaurant::increment_Waiting_Time()
+   Order::Order(int id, ORD_TYPE r_Type)
+   Order::Order(int id, ORD_TYPE r_type, double money, int r_size, int etime)
+Calls:
+   Void
+Function Logic description:
+   Setter for Order's Waiting time
+
+
+
+getWaitingTime
+Member of: Class Order
+Inputs:
+   void  
+Returns:
+   Returns number of time steps the order waited for until has been assigned to a cook 
+Called By:
+   Restaurant::InjureACook(int currtime)
+   Restaurant::Middle_Stage(int currtime) 
+   Restaurant::OutFile()
+   Restaurant::increment_Waiting_Time()
+Calls:
+   Void
+Function Logic description:
+   Getter for Order's Waiting time
+
+ 
+operator==
+Member of: Class Order
+Inputs:
+  O2: another Order to compare with
+Returns:
+   Returns if the ID of this Order equal the ID of the other Order
+Called By:
+
+Calls:
+   Void
+Function Logic description:
+   define the == operator for Order class (RHS : "another order")
+
+
+
+
+operator>
+Member of: Class Order
+Inputs:
+  O2:another Order to compare with
+Returns:
+   Returns if this Order has heigher priority from the other Order
+Called By:
+
+Calls:
+   void
+Function Logic description:
+   define priority of Order (depends on it's status this priority changes)
+
+
+operator==
+Member of: Class Order
+Inputs:
+   id: Order id to compare with 
+Returns:
+   Returns if this Order has the same id 
+Called By:
+
+Calls:
+   void
+Function Logic description:
+   define the == operator for Order class ( RHS : an integer)
+
+
+
+
+

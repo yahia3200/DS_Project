@@ -38,10 +38,8 @@ public:
 	void setTotalMoney(double M);
 	double getTotalMoney() const;
 
-	void setOrderSize(int ordsize);
 	int getOrderSize() const;
 
-	void setArrTime(int T);
 	int getArrTime() const;
 
 	void setServTime(int T);

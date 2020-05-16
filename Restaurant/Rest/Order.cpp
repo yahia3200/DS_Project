@@ -1,8 +1,5 @@
 #include "Order.h"
 
-//Order::Order()
-//{ 
-//}
 
 Order::Order(int id, ORD_TYPE r_Type)
 {
@@ -70,20 +67,12 @@ double Order::getTotalMoney() const
 	return totalMoney;
 }
 
-void Order::setOrderSize(int ordsize)
-{
-	orderSize = ordsize;
-}
 
 int Order::getOrderSize() const
 {
 	return orderSize;
 }
 
-void Order::setArrTime(int T)
-{
-	ArrTime = T;
-}
 
 int Order::getArrTime() const
 {
