@@ -5,6 +5,8 @@
 using namespace std;
 
 #include"Node.h"
+#include "../Rest/Order.h"
+#include "../Rest/Cook.h"
 
 template < typename T>
 class LinkedList
@@ -29,10 +31,15 @@ public:
 
 	T* toArray();
 	T Remove_Head();
-	int getCount() const { return count; }
-	T get_by_index(int  index);
+	int getCount();
 
 }; // end Node
+
+template < typename T>
+int LinkedList<T>::getCount()
+{
+	return count;
+}
 
 template < typename T>
 T LinkedList<T>::peekHead()
@@ -81,22 +88,6 @@ T LinkedList<T>::Remove_Head()
 	return item;
 }
 
-template<typename T>
- T LinkedList<T>::get_by_index(int index)
-{
-	 Node<T>* ptr = Head;
-
-	 while (ptr)
-	 {
-		 if (*(ptr->getItem()) == index)
-			 return ptr->getItem();
-
-		 ptr = ptr->getNext();
-	 }
-
-	 return nullptr;
-}
-
 template < typename T>
 Node<T>* LinkedList<T>::getPrevPointer(const T& theEntry)
 {
@@ -118,6 +109,7 @@ Node<T>* LinkedList<T>::getPrevPointer(const T& theEntry)
 	}
 	return nullptr;
 }
+
 
 template < typename T>
 void LinkedList<T>::insertEnd(const T& newEntry)
@@ -228,6 +220,191 @@ void LinkedList<T>::printList()
 	}
 	cout << endl;
 }
+
+
+////////////////////////////////////////////////////////////
+//////// Full Template Specialization For Orders////////////
+////////////////////////////////////////////////////////////
+
+template <>
+class LinkedList<Order*>
+{
+private:
+	int count;     
+	Node<Order*>* Head; 
+	Node<Order*>* Tail; 
+public:
+	LinkedList()
+	{
+		Head = nullptr;
+		Tail = nullptr;
+		count = 0;
+	}
+	void insertEnd(Order*& newEntry)
+	{
+		if (isEmpty())
+		{
+			Head = Tail = new Node<Order*>(newEntry);
+			count++;
+			return;
+		}
+
+		Node<Order*>* addedNode = new Node<Order*>(newEntry);
+		Tail->setNext(addedNode);
+		Tail = addedNode;
+		count++;
+	}
+
+	bool isEmpty()
+	{
+		return (Head == nullptr);
+	}
+	Order* deleteNode(Order*& requiredEntry)
+	{
+		if (isEmpty())
+		{
+			return nullptr;
+		}
+
+		Node<Order*>* temp;
+		Order* item;
+
+		//Incase the requiredEntery is found in the first node
+		if (Head->getItem() == requiredEntry)
+		{
+			item = Head->getItem();
+
+			temp = Head;
+			Head = Head->getNext();
+			delete temp;
+			count--;
+
+			//If unfortunately the requiredNode to be deleted is the only node in the list
+			if (!Head)
+			{
+				Tail = nullptr;
+			}
+
+			return item;
+		}
+
+		Node<Order*>* prevNode = getPrevPointer(requiredEntry);
+
+		//if the requiredEntery is not found;
+		//ofcourse there isn't a prevpointer to a not-found Entry
+		if (!prevNode)
+		{
+			return nullptr;
+		}
+
+		Node<Order*>* requiredNode = prevNode->getNext();
+
+		//If the requiredNode is the last Node in the list
+		//Handling the Tail
+		if (!(requiredNode->getNext()))
+		{
+			Tail = prevNode;
+		}
+
+		item = requiredNode->getItem();
+
+		prevNode->setNext(requiredNode->getNext());
+		delete requiredNode;
+		count--;
+		return item;
+	}
+	Node<Order*>* getPrevPointer(Order*& theEntry)
+	{
+		if (!Head || (Head->getItem() == theEntry))
+		{
+			return nullptr;
+		}
+
+		Node<Order*>* temp = Head;
+		Node<Order*>* nextTemp = temp->getNext();
+		while (nextTemp)
+		{
+			if (nextTemp->getItem() == theEntry)
+			{
+				return temp;
+			}
+			temp = nextTemp;
+			nextTemp = nextTemp->getNext();
+		}
+		return nullptr;
+	}
+												
+	void clear()
+	{
+		if (!isEmpty())
+		{
+			Node<Order*>* temp;
+
+			do
+			{
+				temp = Head;
+				Head = Head->getNext();
+				delete temp;
+			} while (Head);
+
+			Tail = nullptr;
+			count = 0;
+		}
+	}
+
+	Order* peekHead()
+	{
+		return Head->getItem();
+	}
+
+	Order** toArray()
+	{
+		if (!Head) { return NULL; }
+
+		Order** Array = new Order * [count];
+		Node<Order*>* temp = Head;
+		for (int i = 0; i < count; i++)
+		{
+			Array[i] = temp->getItem();
+			temp = temp->getNext();
+		}
+		return Array;
+	}
+	Order* Remove_Head()
+	{
+		if (!Head)
+			return nullptr;
+
+		Order* item = Head->getItem();
+
+		Node<Order*>* temp = Head;
+		Head = Head->getNext();
+
+		if (!Head) { Tail = nullptr; }
+
+		delete temp;
+		count--;
+		return item;
+	}
+	int getCount()
+	{
+		return count;
+	}
+	Order* get_by_index(int  index)
+	{
+		Node<Order*>* ptr = Head;
+
+		while (ptr)
+		{
+			if (*(ptr->getItem()) == index)
+				return ptr->getItem();
+
+			ptr = ptr->getNext();
+		}
+
+		return nullptr;
+	}
+};
 
 
 #endif

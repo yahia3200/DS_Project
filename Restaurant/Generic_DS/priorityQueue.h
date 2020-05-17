@@ -1,6 +1,5 @@
 #include"TNode.h"
-#include "..\Rest\Order.h"
-#include "..\Rest\Cook.h"
+
 #include<iostream> 
 using namespace std;
 #ifndef _PRIORITY_QUEUE_H
@@ -411,7 +410,7 @@ class PriorityQueue<T*>
 			insert(subroot->getright(), item);
 		}
 	}
-	void dtree(TNode<T*>*& subroot) //Destroy Tree (Deletes all the nodes in the tree)
+	void dtree(TNode<T*>*& subroot)
 	{
 		if (subroot != nullptr)
 		{
@@ -525,7 +524,6 @@ T** PriorityQueue<T*>::toArray()
 	rec_to_array(Root, Array, i);
 	return Array;
 }
-
 
 template<typename T>
 PriorityQueue<T*>::~PriorityQueue()

@@ -27,7 +27,7 @@ private:
 	Queue<Order*> Waiting_GO;	
 
 	//Add a linkedlist for N orders Named Waiting_NO //NO stands for Normal Orders
-	LinkedList <Order*> Waiting_NO;
+	LinkedList<Order*> Waiting_NO;
 	
 	//hala // will temporary create a queue for the V orders Named Waition_VO//VO for VIP orders
 	//this will instatnly be changed once we have a priority queue
