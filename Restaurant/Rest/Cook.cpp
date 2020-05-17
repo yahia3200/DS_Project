@@ -52,12 +52,25 @@ void Cook::setSpeed(int s)
 	if (s <= 0)
 		throw "Unvalid Speed";
 
-	speed = s == 0 ? 1 : s;
+	speed = s;
 }
 
 int Cook::getSpeed() const
 {
 	return speed;
+}
+
+void Cook::setNormalSpeed(int s)
+{
+	if (s <= 0)
+		throw "Unvalid Speed";
+
+	normal_speed = s;
+}
+
+int Cook::getNormalSpeed()
+{
+	return normal_speed;
 }
 
 void Cook::setFinishedOrders(int orders)

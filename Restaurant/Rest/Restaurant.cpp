@@ -62,7 +62,7 @@ void Restaurant::SimpleSimulator(PROG_MODE mode)
 			break;
 		case MODE_STEP:
 			pGUI->UpdateInterface();
-			Sleep(1000);
+			//Sleep(1000);
 			break;
 		default:
 			break;
@@ -114,6 +114,7 @@ void Restaurant::LoadFile()
 		CookPtr->setID(i + 1);
 		CookPtr->setType(TYPE_NRM);
 		CookPtr->setSpeed(( rand() % (SN_max - SN_min + 1) ) + SN_min);
+		CookPtr->setNormalSpeed(CookPtr->getSpeed());
 		CookPtr->setBreakDuration((rand() % (BN_max - BN_min + 1)) + BN_min);
 		CookPtr->setRestperiod(RstPrd);
 		Available_NC.enqueue(CookPtr);
@@ -128,6 +129,7 @@ void Restaurant::LoadFile()
 		CookPtr->setID(i + 1 + NumOfNC);
 		CookPtr->setType(TYPE_VGAN);
 		CookPtr->setSpeed((rand() % (SG_max - SG_min + 1)) + SG_min);
+		CookPtr->setNormalSpeed(CookPtr->getSpeed());
 		CookPtr->setBreakDuration((rand() % (BG_max - BG_min + 1)) + BG_min);
 		CookPtr->setRestperiod(RstPrd);
 		Available_GC.enqueue(CookPtr);
@@ -142,6 +144,7 @@ void Restaurant::LoadFile()
 		CookPtr->setID(i + 1 + NumOfNC + NumOfGC);
 		CookPtr->setType(TYPE_VIP);
 		CookPtr->setSpeed((rand() % (SV_max - SV_min + 1)) + SV_min);
+		CookPtr->setNormalSpeed(CookPtr->getSpeed());
 		CookPtr->setBreakDuration((rand() % (BV_max - BV_min + 1)) + BV_min);
 		CookPtr->setRestperiod(RstPrd);
 		Available_VC.enqueue(CookPtr);
@@ -675,7 +678,7 @@ void Restaurant::ExitRestList(int currenttime)
 	
 	while (in_rest.peekFront(c) && c->getEndRestTime() == currenttime)
 	{
-		c->setSpeed(c->getSpeed() * 2);
+		c->setSpeed(c->getNormalSpeed());
 		
 		if (c->getFinishedOrders() % BO == 0)
 		{

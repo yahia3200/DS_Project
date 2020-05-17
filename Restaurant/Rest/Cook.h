@@ -10,6 +10,7 @@ class Cook
 	ORD_TYPE type;	//for each order type there is a corresponding type (VIP, Normal, Vegan)
 	COOK_STATUS status; //status of this cook
 	int speed;		//dishes it can prepare in one clock tick (in one timestep)
+	int normal_speed;
 	int finishedOrders; //number of orders that this cook has finished 
 	int breakDuration;  //duration of the break
 	Order* currentOrder; //the order that being survied now by this cook
@@ -32,6 +33,9 @@ public:
 
 	void setSpeed(int s);
 	int getSpeed() const;
+
+	void setNormalSpeed(int s);
+	int getNormalSpeed();
 
 	void setFinishedOrders(int orders);
 	int getFinishedOrders() const;
