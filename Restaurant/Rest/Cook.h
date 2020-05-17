@@ -55,7 +55,7 @@ public:
 	void setEndRestTime(int);
 	int getEndRestTime()const;
 
-	bool operator==(const Cook&);
-	bool operator>(const Cook&);
+	bool operator==(const Cook&) const;
+	bool operator>(const Cook&) const;
 
 };

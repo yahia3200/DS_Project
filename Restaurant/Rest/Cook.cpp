@@ -133,13 +133,13 @@ int Cook::getEndRestTime() const
 	return endRestTime;
 }
 
-bool Cook::operator==(const Cook& C2)
+bool Cook::operator==(const Cook& C2) const
 {
 	return (ID == C2.ID);
 }
 
 // priority of cooks
-bool Cook::operator>(const Cook& C2)
+bool Cook::operator>(const Cook& C2) const
 {
 	Order* O1 = this->getCurrentOrder();
 	Order* O2 = C2.getCurrentOrder();
