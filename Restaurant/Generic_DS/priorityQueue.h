@@ -52,7 +52,7 @@ class PriorityQueue
 
 		while (temp && (temp->getleft() || temp->getright()))
 		{
-			if (temp->getleft() && (temp->getleft())->getitem() == Value)
+			if (temp->getleft() && (*(temp->getleft())->getitem()) == *Value)
 			{
 				del = temp->getleft();
 
@@ -82,7 +82,7 @@ class PriorityQueue
 				delete del;
 				return delItem;
 			}
-			else if (temp->getright() && (temp->getright())->getitem() == Value)
+			else if (temp->getright() && (*(temp->getright())->getitem()) == *Value)
 			{
 				del = temp->getright();
 
@@ -129,6 +129,7 @@ class PriorityQueue
 	{
 		if (subroot == NULL)
 			subroot = new TNode<T>(item);
+
 		else if (*(subroot->getitem()) > *item)
 		{
 			insert(subroot->getleft(), item);

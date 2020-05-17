@@ -16,6 +16,7 @@ private:
 public:
 	LinkedList();
 	void insertEnd(const T& newEntry);          //Inserts a new node at the end of the list
+
 	bool isEmpty();
 	T deleteNode(const T& theEntry);			//Specifically for deleting a normal order that has been cancelled or promoted
 	Node<T>* getPrevPointer(const T& theEntry); //returning the node before the required node

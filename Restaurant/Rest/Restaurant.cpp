@@ -509,10 +509,11 @@ void Restaurant::InjureACook(int currtime)
 
 	R = float(rand() % 11) / 10; //Number between (0->10) is generated then divided by 10 (0, 0.1, 0.2, 0.3, ..... 0.9, 1)
 
-	if (R <= InjProp && !busy_cooks.isEmpty())
+	if (R <= InjProp && !busy_cooks.isEmpty() && busy_cooks.Peek()->getStatus() != INJURED)
 	{
 		//the dequeue and the enqueue to enter the cook at the correct position after injury
 		//the same will be done with the order assigned to this injured cook (to reEnter the order in its correct position after changing the FT)
+
 
 		injuredC = busy_cooks.dequeue();
 
@@ -522,6 +523,9 @@ void Restaurant::InjureACook(int currtime)
 		int OldSpeed = injuredC->getSpeed(); //The old speed for the cook before injury
 		int Finished_Dishes = old_true_component_of_SRV_time * OldSpeed; //Number of finished dishes untill this time step but not including it 
 		int UNFinished_Dishes = (injuredC_Ord->getOrderSize()) - Finished_Dishes;
+
+		if (injuredC->getSpeed() == 1)
+			cout << "1";
 
 		injuredC->setSpeed(float(injuredC->getSpeed()) / 2); //a problem with the speed's int division
 		int NewSpeed = injuredC->getSpeed();
@@ -630,7 +634,7 @@ void Restaurant::ExitBusyList(Cook* &c,int currenttime) {
 	//Is there is a possibility for this case to happen?
 	
 	c->setFinishedOrders(c->getFinishedOrders() + 1);
-	c->setCurrentOrder(nullptr);
+	
 
 	//When an injured cook finishes his order
 	if (c->getStatus() == INJURED)
@@ -638,6 +642,7 @@ void Restaurant::ExitBusyList(Cook* &c,int currenttime) {
 		//Inorder to dequeue the correct cook, the cook should have a status of busy
 		c->setStatus(BUSY);
 		busy_cooks.dequeue();
+		c->setCurrentOrder(nullptr);
 		//We should make his's status INJURED so that he can exit the in_rest list correctly
 		c->setStatus(INJURED);
 		in_rest.enqueue(c);
@@ -646,6 +651,7 @@ void Restaurant::ExitBusyList(Cook* &c,int currenttime) {
 	else if (c->getFinishedOrders() % BO == 0) //meets the no of  orders before break 
 	{
 		busy_cooks.dequeue();
+		c->setCurrentOrder(nullptr);
 		c->setStatus(BREAK);
 		c->setEndBreakTime(currenttime + c->getBreakDuration());
 		in_break.enqueue(c);
@@ -666,10 +672,11 @@ void Restaurant::ExitRestList(int currenttime)
 {
 	if (in_rest.isEmpty())return;
 	Cook* c;
-	in_rest.peekFront(c);
-	while (c && c->getEndRestTime() == currenttime)
+	
+	while (in_rest.peekFront(c) && c->getEndRestTime() == currenttime)
 	{
 		c->setSpeed(c->getSpeed() * 2);
+		
 		if (c->getFinishedOrders() % BO == 0)
 		{
 			//Go to break
@@ -682,13 +689,13 @@ void Restaurant::ExitRestList(int currenttime)
 		{
 			ToAvailableList(c);
 		}
-		in_rest.peekFront(c);
+		
 	}
 }
 
 void Restaurant::ToAvailableList(Cook*& c) {
 	ORD_TYPE type = c->GetType();
-	COOK_STATUS stat=c->getStatus();
+	COOK_STATUS stat =c->getStatus();
 	if (stat == BUSY) {
 		busy_cooks.dequeue();
 	}
@@ -712,7 +719,7 @@ void Restaurant::ToAvailableList(Cook*& c) {
 		break;
 	}
 	c->setStatus(AVAILABLE);
-
+	c->setCurrentOrder(nullptr);
 }
 void Restaurant::ThirdStage(int currenttime) {
 	ExitBreakList(currenttime);
