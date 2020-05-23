@@ -17,7 +17,10 @@ class Cook
 	int endBreakTime; // time step at which the break for this cook will end
 	int endRestTime; // time step at which the rest for this cook will end
 	int rst_prd;//Rest Period for medication
-
+	
+	//This flag is used to keep track of the cooks that has been assigned to an urgent order, so that we can know when to restore it's speed. 
+	bool Had_Urgent; //true if the cook has been assigned to an urgent order // false, if it hasn't been assigned to an urgent order
+	
 public:
 	Cook();
 	virtual ~Cook();
@@ -54,6 +57,9 @@ public:
 
 	void setEndRestTime(int);
 	int getEndRestTime()const;
+
+	void setHad_Urgent(bool);
+	bool getHad_Urgent()const;
 
 	bool operator==(const Cook&) const;
 	bool operator>(const Cook&) const;

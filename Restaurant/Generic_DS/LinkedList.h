@@ -18,7 +18,9 @@ private:
 public:
 	LinkedList();
 	void insertEnd(const T& newEntry);          //Inserts a new node at the end of the list
+	void insertSorted(const T& item);          //Inserts a new node in its correct position
 
+	
 	bool isEmpty();
 	T deleteNode(const T& theEntry);			//Specifically for deleting a normal order that has been cancelled or promoted
 	Node<T>* getPrevPointer(const T& theEntry); //returning the node before the required node
@@ -34,6 +36,46 @@ public:
 	int getCount();
 
 }; // end Node
+
+template<class T>
+void LinkedList<T>::insertSorted(const T& item)
+{
+	//If the ll is empty
+	if (!Head){ Tail = Head = new Node<T>(item); return; }
+
+	Node<T>* temp = Head;
+
+	//If the node to be inserted, gretter than the Head 
+	//(i.e must be inserted before the head)
+	//(i.e the node to be inserted is the new Head for the ll)
+
+	if (item > temp->getItem())
+	{
+		Head = new Node<T>(item);
+		Head->setNext(temp);
+		return;
+	}
+
+	//loop till you reach the node that should be after the inserted node.
+	while (temp->getNext() && item < (temp->getNext())->getItem())
+	{
+		temp = temp->getNext();
+	}
+	//next is the node that should be after the inserted one.
+	Node<T>* next = temp->getNext();
+	Node<T>* newPtr = new Node<T>(item);
+	//temp is the node that should be before the inserted one.
+	temp->setNext(newPtr);
+	newPtr->setNext(next);
+
+	//Handiling the Tail
+	//If the node to be inserted was the last Node in the ll
+	if (!next)
+	{
+		Tail = newPtr;
+	}
+}
+
 
 template < typename T>
 int LinkedList<T>::getCount()
@@ -255,10 +297,57 @@ public:
 		count++;
 	}
 
+	void insertSorted(Order*& item)
+	{
+		//If the ll is empty
+		if (!Head)
+		{ 
+			Tail = Head = new Node<Order*>(item); count++; return; 
+		}
+
+		Node<Order*>* temp = Head;
+
+		//If the node to be inserted, gretter than the Head 
+		//(i.e must be inserted before the head)
+		//(i.e the node to be inserted is the new Head for the ll)
+
+		if (*item > *(temp->getItem()))
+		{
+			Head = new Node<Order*>(item);
+			Head->setNext(temp);
+			count++;
+			return;
+		}
+
+		//loop till you reach the node that should be after the inserted node.
+		while (temp->getNext() && *((temp->getNext())->getItem()) > *item)
+		{
+			temp = temp->getNext();
+		}
+
+		//next is the node that should be after the inserted one.
+		Node<Order*>* next = temp->getNext();
+		Node<Order*>* newPtr = new Node<Order*>(item);
+
+		//temp is the node that should be before the inserted one.
+		temp->setNext(newPtr);
+		newPtr->setNext(next);
+		count++;
+
+		//Handiling the Tail
+		//If the node to be inserted was the last Node in the ll
+		if (!next)
+		{
+			Tail = newPtr;
+		}
+	}
+
+
 	bool isEmpty()
 	{
 		return (Head == nullptr);
 	}
+
 	Order* deleteNode(Order*& requiredEntry)
 	{
 		if (isEmpty())
@@ -313,6 +402,7 @@ public:
 		count--;
 		return item;
 	}
+	
 	Node<Order*>* getPrevPointer(Order*& theEntry)
 	{
 		if (!Head || (Head->getItem() == theEntry))

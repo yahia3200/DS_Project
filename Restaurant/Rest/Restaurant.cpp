@@ -378,7 +378,7 @@ void Restaurant::ToWaitingList(Order* neworder)
 		Waiting_GO.enqueue(neworder);
 		break;
 	case TYPE_VIP:
-		Waiting_VO.enqueue(neworder);
+		Waiting_VO.insertSorted(neworder);
 		break;
 
 	}
@@ -401,7 +401,7 @@ void Restaurant::RemoveFromDrawing(Order* dOrder)
 }
 void Restaurant::ToVIP(Order* ord)
 {
-	Waiting_VO.enqueue(ord);
+	Waiting_VO.insertSorted(ord);
 }
 void Restaurant::SetOrdAssigned(int s) {
 	Ordassigned = s;
@@ -423,9 +423,18 @@ void Restaurant::increment_Waiting_Time()
 	if (!Waiting_VO.isEmpty())
 	{
 		Order** VO_Array = Waiting_VO.toArray();
-		for (int i = 0; i < Waiting_VO.getCount(); i++)
+		int VO_Count = Waiting_VO.getCount();
+		for (int i = 0; i < VO_Count; i++)
 		{
 			VO_Array[i]->setWaitingTime(VO_Array[i]->getWaitingTime() + 1);
+			//The time step after this will be the one were the VIP order cannot wait any longer and should be assigned
+			if (VO_Array[i]->getWaitingTime() == VIP_WT)
+			{
+				//It's time to be an URGENT order
+				Waiting_VO.deleteNode(VO_Array[i]);
+				Waiting_Urgent.enqueue(VO_Array[i]);
+				NumOfUrgentVO++;
+			}
 		}
 		delete[] VO_Array;
 	}
@@ -462,6 +471,39 @@ void Restaurant::increment_Waiting_Time()
 		delete[] GO_Array;
 	}
 }
+
+bool Restaurant::Assign_To_InBreak_Cook(Order* InSRV_O, Cook* &AC)
+{
+
+	if (!in_break.isEmpty())
+	{
+		AC = in_break.dequeue(); // peeking 
+		AC->setStatus(BUSY); //update the cooker'status to "BUSY"
+		AC->setCurrentOrder(InSRV_O); // assign the order to the cooker
+		Assigned_cook.enqueue(AC);
+		AC->setHad_Urgent(true);
+		AC->setSpeed((AC->getSpeed()) / 2); //His speed should be its half till the next break inshallah
+		return true;
+	}
+	return false;
+}
+
+bool Restaurant::Assign_To_InRest_Cook(Order* InSRV_O, Cook* &AC)
+{
+
+	if (!in_rest.isEmpty())
+	{
+		//His Speed is already set to its half
+		in_rest.dequeue(AC); // peeking 
+		AC->setStatus(BUSY); //update the cooker'status to "BUSY"
+		AC->setCurrentOrder(InSRV_O); // assign the order to the cooker
+		Assigned_cook.enqueue(AC);
+		AC->setHad_Urgent(true);
+		return true;
+	}
+	return false;
+}
+
 bool Restaurant::Assign_To_VC(Order* InSRV_O, Cook* &AC)
 {
 
@@ -527,9 +569,6 @@ void Restaurant::InjureACook(int currtime)
 		int Finished_Dishes = old_true_component_of_SRV_time * OldSpeed; //Number of finished dishes untill this time step but not including it 
 		int UNFinished_Dishes = (injuredC_Ord->getOrderSize()) - Finished_Dishes;
 
-		if (injuredC->getSpeed() == 1)
-			cout << "1";
-
 		injuredC->setSpeed(float(injuredC->getSpeed()) / 2); //a problem with the speed's int division
 		int NewSpeed = injuredC->getSpeed();
 		int new_component_of_SRV_time = ceil(float(UNFinished_Dishes) / NewSpeed); //calculation of the new part of the service time
@@ -555,14 +594,37 @@ void Restaurant::Middle_Stage(int currtime)
 
 	Cook* AC; // Available cooker for any type
 	
+	///////////////////////////////////////// URGENTS ASSIGNMENT ////////////////////////////////
+
+	while (!Waiting_Urgent.isEmpty())
+	{
+		Waiting_Urgent.peekFront(InSRV_O);
+		if (Assign_To_VC(InSRV_O, AC) || Assign_To_NC(InSRV_O, AC) || Assign_To_GC(InSRV_O, AC) || Assign_To_InBreak_Cook(InSRV_O, AC) || Assign_To_InRest_Cook(InSRV_O, AC))
+		{
+			Order* temp; // just because of the implementation of dequeue function in class Queue
+			Waiting_Urgent.dequeue(temp);
+			int ST = ceil(float(InSRV_O->getOrderSize()) / AC->getSpeed()); //calculation of serving time
+			InSRV_O->setServTime(ST);
+			int FT = InSRV_O->getArrTime() + InSRV_O->getServTime() + InSRV_O->getWaitingTime();// calculation of finished time
+			InSRV_O->setFinishTime(FT);
+			InSRV_O->setStatus(SRV);
+			busy_cooks.enqueue(AC);
+			Being_Served.enqueue(InSRV_O); //move to being served list
+		}
+		else
+		{
+			break;
+		}	
+	}
+
 	//----------------1) for vip order assignment ---------------
 	while (!Waiting_VO.isEmpty())
 	{
-		InSRV_O = Waiting_VO.Peek();//peek the highest priority order but without deleting yet
+		InSRV_O = Waiting_VO.peekHead();//peek the highest priority order but without deleting yet
 
 		if (Assign_To_VC(InSRV_O, AC) || Assign_To_NC(InSRV_O, AC) || Assign_To_GC(InSRV_O, AC))
 		{
-			Waiting_VO.dequeue();// after confirming the order status == srv , delete it from waiting list
+			Waiting_VO.Remove_Head();// after confirming the order status == srv , delete it from waiting list
 			int ST = ceil(float(InSRV_O->getOrderSize()) / AC->getSpeed()); //calculation of serving time
 			InSRV_O->setServTime(ST);
 			int FT = InSRV_O->getArrTime() + InSRV_O->getServTime() + InSRV_O->getWaitingTime();// calculation of finished time
@@ -630,24 +692,20 @@ void Restaurant::Middle_Stage(int currtime)
 
 //***********************************Third Stage Functions*****************************
 
-void Restaurant::ExitBusyList(Cook* &c,int currenttime) {
-	
-	//From NORAN to Earth
-	//Should we cover the case of a neither BUSY nor INJURED cook, and tell him to return from this function?
-	//Is there is a possibility for this case to happen?
+void Restaurant::ExitBusyList(Cook* &c,int currenttime) 
+{
 	
 	c->setFinishedOrders(c->getFinishedOrders() + 1);
 	
-
 	//When an injured cook finishes his order
 	if (c->getStatus() == INJURED)
 	{
 		//Inorder to dequeue the correct cook, the cook should have a status of busy
-		c->setStatus(BUSY);
+		c->setStatus(BUSY); //al str da mlo4 lzma
 		busy_cooks.dequeue();
 		c->setCurrentOrder(nullptr);
 		//We should make his's status INJURED so that he can exit the in_rest list correctly
-		c->setStatus(INJURED);
+		c->setStatus(INJURED); //al str da mlo4 lzma
 		in_rest.enqueue(c);
 		c->setEndRestTime(currenttime + (c->getRestperiod()));
 	}
@@ -658,6 +716,12 @@ void Restaurant::ExitBusyList(Cook* &c,int currenttime) {
 		c->setStatus(BREAK);
 		c->setEndBreakTime(currenttime + c->getBreakDuration());
 		in_break.enqueue(c);
+		if (c->getHad_Urgent())
+		{
+			//We should restore his original Speed
+			c->setSpeed(c->getNormalSpeed());
+			c->setHad_Urgent(false);
+		}
 	}
 	else ToAvailableList(c);
 }
@@ -722,7 +786,7 @@ void Restaurant::ToAvailableList(Cook*& c) {
 		break;
 	}
 	c->setStatus(AVAILABLE);
-	c->setCurrentOrder(nullptr);
+	c->setCurrentOrder(nullptr); 
 }
 void Restaurant::ThirdStage(int currenttime) {
 	ExitBreakList(currenttime);
@@ -730,7 +794,7 @@ void Restaurant::ThirdStage(int currenttime) {
 	Cook * c;
 	Order* ord;
 	
-	ord = Being_Served.Peek(); //PROBLEM
+	ord = Being_Served.Peek(); 
 	while (ord &&ord->getFinishTime() == currenttime) {
 		Finshed_orders.enqueue(ord);
 		switch (ord->GetType()) {

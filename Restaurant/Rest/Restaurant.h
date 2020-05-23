@@ -21,19 +21,15 @@ private:
 	GUI *pGUI;
 	Queue<Event*> EventsQueue;	//Queue of all events that will be loaded from file
 
-	//
-	// TODO: Add More Data Members As Needed
 	//Add a queue for G orders Named Waiting_GO //GO stands for Vegan Orders
 	Queue<Order*> Waiting_GO;	
 
 	//Add a linkedlist for N orders Named Waiting_NO //NO stands for Normal Orders
 	LinkedList<Order*> Waiting_NO;
 	
-	//hala // will temporary create a queue for the V orders Named Waition_VO//VO for VIP orders
-	//this will instatnly be changed once we have a priority queue
-	//but just for the time being to test simulating function
-	LinkedList<Order*> Drawing;   //hala//added to point to all orders//to be used in filldrawinglist function
-    PriorityQueue<Order*> Waiting_VO;// menna//i changed it to priorityQueue
+	LinkedList<Order*> Drawing;   //added to point to all orders//to be used in filldrawinglist function
+	LinkedList<Order*> Waiting_VO;
+	Queue<Order*> Waiting_Urgent; //Contains the Urgent orders
 
 	PriorityQueue<Order*> Being_Served; // for all types of orders that are being served orders
 	Queue<Order*> Finshed_orders; // for all types of orders that have been served
@@ -47,6 +43,7 @@ private:
 	Queue<Cook*> in_rest;// for cooks who got injured and took rest for medication care
 	//We will need this in the output file
 	int NumOfAutoPNO = 0; //Number of autopromoted normal orders
+	int NumOfUrgentVO = 0; //Number of urgent VIP orders
 	
 	//the number of cooks of different types
 	int NumOfNC; //For Noraml Cooks
@@ -106,6 +103,8 @@ public:
 	bool Assign_To_VC(Order*, Cook* &);
 	bool Assign_To_NC(Order*, Cook* &);
 	bool Assign_To_GC(Order*, Cook* &);
+	bool Assign_To_InBreak_Cook(Order* InSRV_O, Cook* &AC);
+	bool Assign_To_InRest_Cook(Order* InSRV_O, Cook* &AC);
 
 	void ThirdStage(int currenttime);
 	void ExitBusyList(Cook*&,int);
@@ -113,6 +112,8 @@ public:
 	void ExitRestList(int);
 	void ToAvailableList(Cook*&);
 	void InjureACook(int currtime);
+	void AssignUrgents(int currtime);
+
 
 };
 

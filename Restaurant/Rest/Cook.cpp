@@ -133,6 +133,16 @@ int Cook::getEndRestTime() const
 	return endRestTime;
 }
 
+void Cook::setHad_Urgent(bool value)
+{
+	Had_Urgent = value;
+}
+
+bool Cook::getHad_Urgent()const
+{
+	return Had_Urgent;
+}
+
 bool Cook::operator==(const Cook& C2) const
 {
 	return (ID == C2.ID);
