@@ -419,6 +419,17 @@ int Restaurant::GetOrdAssigned()
 void Restaurant::increment_Waiting_Time()
 {
 	int GO_Count = 0;
+	int Urgent_Count = 0;
+	
+	if (!Waiting_Urgent.isEmpty())
+	{
+		Order** Urgent_Array = Waiting_Urgent.toArray(Urgent_Count);
+		for (int i = 0; i < Urgent_Count; i++)
+		{
+			Urgent_Array[i]->setWaitingTime(Urgent_Array[i]->getWaitingTime() + 1);
+		}
+		delete[] Urgent_Array;
+	}
 	
 	if (!Waiting_VO.isEmpty())
 	{
@@ -428,7 +439,10 @@ void Restaurant::increment_Waiting_Time()
 		{
 			VO_Array[i]->setWaitingTime(VO_Array[i]->getWaitingTime() + 1);
 			//The time step after this will be the one were the VIP order cannot wait any longer and should be assigned
-			if (VO_Array[i]->getWaitingTime() == VIP_WT)
+			//VO_Array[i]->getWaitingTime() == VIP_WT , This line is the condition for the VIPs to become urgent
+			//( VO_Array[i]->getWaitingTime() - AutoP) == VIP_WT , This line is the condition for the Normal who have been autopromoted to become urgent
+
+			if (VO_Array[i]->getWaitingTime() == VIP_WT || ( VO_Array[i]->getWaitingTime() - AutoP) == VIP_WT)
 			{
 				//It's time to be an URGENT order
 				Waiting_VO.deleteNode(VO_Array[i]);
@@ -743,20 +757,7 @@ void Restaurant::ExitRestList(int currenttime)
 	while (in_rest.peekFront(c) && c->getEndRestTime() == currenttime)
 	{
 		c->setSpeed(c->getNormalSpeed());
-		
-		if (c->getFinishedOrders() % BO == 0)
-		{
-			//Go to break
-			in_rest.dequeue(c);
-			c->setStatus(BREAK);
-			c->setEndBreakTime(currenttime + c->getBreakDuration());
-			in_break.enqueue(c);
-		}
-		else
-		{
-			ToAvailableList(c);
-		}
-		
+		ToAvailableList(c);
 	}
 }
 
