@@ -6,6 +6,7 @@ Cook::Cook()
 	status = AVAILABLE;
 	currentOrder = nullptr;//menna
 	finishedOrders = 0;
+	Got_Injured = false;
 }
 
 
@@ -141,6 +142,12 @@ void Cook::setHad_Urgent(bool value)
 bool Cook::getHad_Urgent()const
 {
 	return Had_Urgent;
+}
+void Cook::setGot_Injured(bool value) {
+	Got_Injured = value;
+}
+bool Cook::getGot_Injured()const {
+	return Got_Injured;
 }
 
 bool Cook::operator==(const Cook& C2) const

@@ -199,13 +199,13 @@ void Restaurant::OutFile()
 	out.open("Output.txt");
 	out << "FT ID AT  WT ST \n";
 	Order* top;
-	float total_wait = 0;
-	float total_serv = 0;
-	int NO = 0, VO = 0, GO = 0;
+	float total_wait_time = 0 , total_wait_ord=0 , total_serv = 0;
+	int NO = 0, VO = 0, GO = 0 , Injured_cooks = 0;
 	int total_ord = Finshed_orders.GetCount();
 	while (!Finshed_orders.isEmpty()) {
 		Finshed_orders.dequeue(top);
-		total_wait = total_wait + top->getWaitingTime();
+		if (top->getWaitingTime() != 0) { total_wait_ord++; }
+		total_wait_time = total_wait_time + top->getWaitingTime();
 		total_serv = total_serv + top->getServTime();
 		switch (top->GetType()) {
 		case TYPE_NRM:
@@ -226,28 +226,39 @@ void Restaurant::OutFile()
 		delete top;
 		top = nullptr;
 	}
-	out << "Orders:" <<NO+GO+VO<<" [Norm:"<<NO <<", Veg : "<<GO <<", VIP :" <<VO<< "] "<<endl;
-	out << "Cooks:" << NumOfNC + NumOfGC + NumOfVC << "  [Norm:" << NumOfNC << ", Veg:" << NumOfGC << ", VIP:" << NumOfVC<<" ]"<<endl;
-	out << "Avg Wait =" << total_wait / total_ord << " , Avg Serv =" << total_serv / total_ord << endl;
-	out << "Auto-Promoted :" << NumOfAutoPNO << endl;
-	out.close();
+                ////////////////////////////////////////////////////////////////////////////////
 	Cook* frnt;
 	while (Available_GC.dequeue(frnt)) {
+		if (frnt->getGot_Injured() == true) { Injured_cooks++; }
 		delete frnt;
 		frnt = nullptr;
 	}
 	while (Available_NC.dequeue(frnt)) {
+		if (frnt->getGot_Injured() == true) { Injured_cooks++; }
 		delete frnt;
 		frnt = nullptr;
 	}
 	while (Available_VC.dequeue(frnt)) {
+		if (frnt->getGot_Injured() == true) { Injured_cooks++; }
 		delete frnt;
 		frnt = nullptr;
 	}
 	while (frnt=in_break.dequeue()) {
+		if (frnt->getGot_Injured() == true) { Injured_cooks++; }
 		delete frnt;
 		frnt = nullptr;
 	}
+	while (in_rest.dequeue(frnt)) {
+		if (frnt->getGot_Injured() == true) { Injured_cooks++; }
+		delete frnt;
+		frnt = nullptr;
+	}
+	
+	out << "Orders:" << NO + GO + VO << " [Norm:" << NO << ", Veg : " << GO << ", VIP :" << VO << "] " << endl;
+	out << "Cooks:" << NumOfNC + NumOfGC + NumOfVC << "  [Norm:" << NumOfNC << ", Veg:" << NumOfGC << ", VIP:" << NumOfVC << " ,injured:" << Injured_cooks <<" ]" << endl;
+	out << "Avg Wait =" << total_wait_time / total_wait_ord << " , Avg Serv =" << total_serv / total_ord << endl;
+	out << "Urgent Orders: "<< NumOfUrgentVO<<",  Auto-Promoted :" << (float(NumOfAutoPNO) / float(NumOfAutoPNO + NO))*100<<"%"<< endl;
+	out.close();
 }
 
 void Restaurant::ExecuteEvents(int CurrentTimeStep)
@@ -319,18 +330,18 @@ void Restaurant::PrintInfo(int currenttime) {
 		" Finished_GO:  " + to_string(Finished_GO) +
 		" Finished_NO: " + to_string(Finished_NO));
 	Cook* top;
-	char cook_type;
+	string cook_type;
 	char ord_type;
 	while (Assigned_cook.dequeue(top)) {
-		if (top->GetType() == TYPE_VGAN) { cook_type = 'G'; }
-		else if (top->GetType() == TYPE_NRM) { cook_type = 'N'; }
-		else { cook_type = 'V'; }
+		if (top->GetType() == TYPE_VGAN) { cook_type = "GC"; }
+		else if (top->GetType() == TYPE_NRM) { cook_type = "NC"; }
+		else { cook_type = "VC"; }
 		if (top->getCurrentOrder()->GetType() == TYPE_VGAN) { ord_type = 'G'; }
 		else if (top->getCurrentOrder()->GetType() == TYPE_NRM) { ord_type = 'N'; }
 		else { ord_type = 'V'; }
 
-		pGUI->PrintSeveral(cook_type + to_string(top->GetID()) + " ( "
-			+ord_type + to_string(top->getCurrentOrder()->GetID())
+		pGUI->PrintSeveral(cook_type+ to_string(top->GetID()) + " ( "
+			+ord_type +"O"+ to_string(top->getCurrentOrder()->GetID())
 			+ " )");
 	}
 
@@ -590,12 +601,13 @@ void Restaurant::InjureACook(int currtime)
 		injuredC_Ord->setServTime(old_true_component_of_SRV_time + new_component_of_SRV_time);
 		int FT = injuredC_Ord->getArrTime() + injuredC_Ord->getServTime() + injuredC_Ord->getWaitingTime();// calculation of finished time
 		injuredC_Ord->setFinishTime(FT);
-
+		injuredC->setGot_Injured(true);
 		//Note that I must enqueue it to the busy cooks with a status of BUSY, inorder to insert it based on the least finised time
 		busy_cooks.enqueue(injuredC);
 		Being_Served.enqueue(injuredC_Ord);
 		//This is why we changed the status after the enqueue
 		injuredC->setStatus(INJURED);
+		
 		
 	}
 	//*******************************************************************

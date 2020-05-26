@@ -20,7 +20,7 @@ class Cook
 	
 	//This flag is used to keep track of the cooks that has been assigned to an urgent order, so that we can know when to restore it's speed. 
 	bool Had_Urgent; //true if the cook has been assigned to an urgent order // false, if it hasn't been assigned to an urgent order
-	
+	bool Got_Injured; //this flag to check if the cook ever got injured
 public:
 	Cook();
 	virtual ~Cook();
@@ -61,6 +61,8 @@ public:
 	void setHad_Urgent(bool);
 	bool getHad_Urgent()const;
 
+	void setGot_Injured(bool);
+	bool getGot_Injured()const;
 	bool operator==(const Cook&) const;
 	bool operator>(const Cook&) const;
 

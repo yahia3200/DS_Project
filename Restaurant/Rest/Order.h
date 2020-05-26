@@ -16,13 +16,11 @@ protected:
 	int orderSize;  //Number of dishes
 
 	int ArrTime, ServTime, FinishTime, WaitingTime;	//arrival, service start,  finish and waiting Time
-
+	
 
 public:
 	//Order();//menna// added a default constructure needed for class TNode (copy constructor)
 	Order(int ID, ORD_TYPE r_Type);
-	//hala// added a constructor to facilitate creating an order object
-	//etime for the arrival time
 	Order(int id, ORD_TYPE r_type, double money, int r_size, int etime);
 	virtual ~Order();
 
@@ -51,6 +49,7 @@ public:
 	void setWaitingTime(int T);  //Finish Time will be set also here
 	int getWaitingTime() const;
 
+	
 	bool operator==(const Order&);
 	bool operator>(const Order&);
 	bool operator==(const int&);
