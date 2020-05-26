@@ -62,7 +62,7 @@ void Restaurant::SimpleSimulator(PROG_MODE mode)
 			break;
 		case MODE_STEP:
 			pGUI->UpdateInterface();
-			Sleep(1000);
+			//Sleep(1000);
 			break;
 		default:
 			break;
@@ -568,7 +568,7 @@ void Restaurant::InjureACook(int currtime)
 
 	R = float(rand() % 11) / 10; //Number between (0->10) is generated then divided by 10 (0, 0.1, 0.2, 0.3, ..... 0.9, 1)
 
-	if (R <= InjProp && !busy_cooks.isEmpty() && busy_cooks.Peek()->getStatus() != INJURED)
+	if (R <= InjProp && !busy_cooks.isEmpty() && busy_cooks.Peek()->getStatus() != INJURED && !((busy_cooks.Peek())->getHad_Urgent()))
 	{
 		//the dequeue and the enqueue to enter the cook at the correct position after injury
 		//the same will be done with the order assigned to this injured cook (to reEnter the order in its correct position after changing the FT)
