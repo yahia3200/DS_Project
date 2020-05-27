@@ -1,0 +1,140 @@
+RunSimulation
+...............
+Member of: Class Restaurant
+Inputs:
+  void
+Returns:
+  void
+Called By:
+  Demo_main
+Calls:
+   SimpleSimulator 
+Function Logic description:
+   Chooses the Mode of the program either Interactive,StepByStep,or Silent
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+
+SimpleSimulator
+...............
+Member of: Class Restaurant
+Inputs:
+  PROG_MODE 
+Returns:
+  void
+Called By:
+  RunSimulation
+Calls:
+  LoadFile
+  ExecuteEvents
+  ThirdStage
+  InjureACook
+  Middle_Stage
+  FillDrawingList
+  PrintInfo
+  UpdateInterface
+  WaitForClick
+  ResetDrawingList
+  PrintMessage
+  OutFile 
+Function Logic description:
+   Runs the program  in the appropriate mode chosen and stops when all the orders
+   got finished
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+LoadFile
+...............
+Member of: Class Restaurant
+Inputs:
+  void
+Returns:
+  void
+Called By:
+  SimpleSimulator
+Calls:
+  inValidFormat
+  some setters and enqueue methods
+Function Logic description:
+  Reads the input file by handling at first any error,if exited, in opening the file.
+  If no problem was encountered,cooks and Events are generated using the data given and       enqueued in the  appropriate list .Also,The first 5 lines in the input file are stored in     data members in class restaurant.
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+
+inValidFormat
+...............
+Member of: Class Restaurant
+Inputs:
+  void
+Returns:
+  void
+Called By:
+  LoadFile
+Calls:
+  void
+Function Logic description:
+  is called when the format of the LoadFile is incorrect
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+
+OutFile
+...............
+Member of: Class Restaurant
+Inputs:
+  void
+Returns:
+  void
+Called By:
+  SimpleSimulator
+Calls:
+  some getters and dequeue methods
+Function Logic description:
+  Produces the output File as described in the document(considering the promoted orders in the   count of the VIP orders) and the Canceled orders are not counted. Also all the data in the   heap is cleared.
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+
+FillDrawingList
+...............
+Member of: Class Restaurant
+Inputs:
+  void
+Returns:
+  void
+Called By:
+  void
+Calls:
+  AddToDrawingList
+Function Logic description:
+  Includes all the Cooks and orders in a drawing list to be printed in the GUI 
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+
+PrintInfo
+...............
+Member of: Class Restaurant
+Inputs:
+  currenttime
+Returns:
+  void
+Called By:
+  SimpleSimulator
+Calls:
+  PrintSeveral (in the GUI)
+  some getters 
+Function Logic description:
+  Prints  the data mentioned in the document in the status bar 
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+
+increment_Waiting_Time
+...............
+Member of: Class Restaurant
+Inputs:
+  void
+Returns:
+  void
+Called By:
+  MiddleStage
+Calls:
+  some setters, enqueue and dequeue methods
+Function Logic description:
+  increments the waiting time of all the waiting orders,and any VIP that waitied for the "VIP   to Urgent limit" will be changed to Urgent order.Also,any normal that reached the   autopromotion limit is changed to VIP.
+//////////////////////////////////////////////////////////////////////////////////////////////
