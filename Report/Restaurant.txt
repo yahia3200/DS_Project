@@ -138,3 +138,211 @@ Calls:
 Function Logic description:
   increments the waiting time of all the waiting orders,and any VIP that waitied for the "VIP   to Urgent limit" will be changed to Urgent order.Also,any normal that reached the   autopromotion limit is changed to VIP.
 //////////////////////////////////////////////////////////////////////////////////////////////
+
+
+Assign_To_InBreak_Cook
+...............
+Member of: Class Restaurant
+Inputs:
+  Order* ,Cook*
+Returns:
+  bool
+Called By:
+  MiddleStage
+Calls:
+  some setters, enqueue and dequeue methods
+Function Logic description:
+  If there is cook in break, the urgent order is assigned to it
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+
+Assign_To_InRest_Cook
+...............
+Member of: Class Restaurant
+Inputs:
+  Order* ,Cook*
+Returns:
+  bool
+Called By:
+  MiddleStage
+Calls:
+  some setters, enqueue and dequeue methods
+Function Logic description:
+  If there is  a cook in rest , the urgent     order is assigned to it
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+
+Assign_To_VG
+...............
+Member of: Class Restaurant
+Inputs:
+  Order* ,Cook*
+Returns:
+  bool
+Called By:
+  MiddleStage
+Calls:
+  some setters, enqueue and dequeue methods
+Function Logic description:
+  assign an order to a VIP cook if there is VIP cook available. If   assignment is done true is   returned.
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+
+Assign_To_NC
+...............
+Member of: Class Restaurant
+Inputs:
+  Order* ,Cook*
+Returns:
+  bool
+Called By:
+  MiddleStage
+Calls:
+  some setters, enqueue and dequeue methods
+Function Logic description:
+  assign an order to a Normal cook if there is Normal cook available. If       assignment is done true is   returned.
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+
+Assign_To_GC
+...............
+Member of: Class Restaurant
+Inputs:
+  Order* ,Cook*
+Returns:
+  bool
+Called By:
+  MiddleStage
+Calls:
+  some setters, enqueue and dequeue methods
+Function Logic description:
+ assign an order to a Vegan cook if there is Vegan cook available. If     assignment is done true is returned.
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+
+InjureACook
+...............
+Member of: Class Restaurant
+Inputs:
+  currenttime
+Returns:
+  void
+Called By:
+  SimpleSimulator
+Calls:
+  some setters, enqueue and dequeue methods
+Function Logic description:
+ Injure a cook if the Random number<=Injure Probability.The cook that should  be injured must be a busy cook that is not already injured.
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+
+Middle_Stage
+...............
+Member of: Class Restaurant
+Inputs:
+  currenttime
+Returns:
+  void
+Called By:
+  SimpleSimulator
+Calls:
+  Assign_To_InBreak_Cook
+  Assign_To_InRest_Cook
+  Assign_To_VC
+  Assign_To_NC
+  Assign_To_GC
+  increment_Waiting_Time
+  some setters, enqueue and dequeue methods
+Function Logic description:
+ Assign the orders in waiting list according to their imortance and to the  appropriate cook possible. Thus,Urgent orders are assigned first, then VIP  then Vegan and lastly Normal orders are assigned.Each of these orders are  assigned to the best cook as descibed in the document 
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+ThirdStage
+...............
+Member of: Class Restaurant
+Inputs:
+ currenttime
+Returns:
+  void
+Called By:
+  SimpleSimulator
+Calls:
+  ExitBreakList
+  ExitRestList
+  ExitBusyList
+  some getters, setters ,enqueue and dequeue methods
+Function Logic description:
+ Any cook that Finished their Break time goes to available list.Any Cook  that finished an order in this timestep became either availble or in rest  and the prder became a finished order. Any Cook that finished his rest  becomes available.
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+
+ExitRestList
+...............
+Member of: Class Restaurant
+Inputs:
+ currenttime
+Returns:
+  void
+Called By:
+  ThirdStage
+Calls:
+ ToAvailableList
+Function Logic description:
+ Any Cook that finished his rest at this timestep becomes available,and his 
+ speed is restored.
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+
+ExitBreakList
+...............
+Member of: Class Restaurant
+Inputs:
+ currenttime
+Returns:
+  void
+Called By:
+  ThirdStage
+Calls:
+ ToAvailableList
+Function Logic description:
+ Any Cook that finished his break at this timestep becomes available.
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+
+ExitBusyList
+...............
+Member of: Class Restaurant
+Inputs:
+ currenttime
+Returns:
+  void
+Called By:
+  ThirdStage
+Calls:
+ ToAvailableList
+Function Logic description:
+ Any Cook that finished his order at this timestep becomes available if and  only if he is not injured nor meet the number of orders after which he  should have break.If he is injured he goes to rest even if he should also  go to break.If he is not injured but met the orders after which he should  go to break ,then he is placed in Break list.
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+
+ToAvailableList
+...............
+Member of: Class Restaurant
+Inputs:
+ Cook*
+Returns:
+  void
+Called By:
+  ExitBreakList
+  ExitRestList
+  ExitBusyList
+Calls:
+ some setters ,enqueue and dequeue methods.
+Function Logic description:
+ Place the Cook in the corresponding Availble list according to its type (Normal, Vegan,VIP) and restors the order to null.
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
