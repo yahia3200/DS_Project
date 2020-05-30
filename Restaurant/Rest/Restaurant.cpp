@@ -25,7 +25,7 @@ void Restaurant::RunSimulation()
 	pGUI = new GUI;
 	PROG_MODE	mode = pGUI->getGUIMode();
 		
-	switch (mode)	//Add a function for each mode in next phases
+	switch (mode)	
 	{
 	case MODE_INTR:
 		SimpleSimulator(MODE_INTR);
@@ -44,7 +44,7 @@ void Restaurant::SimpleSimulator(PROG_MODE mode)
 {
 	int CurrentTimeStep = 1;
 	LoadFile();
-	//the condition of exeting the loop is to be changed 
+	//the condition of exiting the loop is to be changed 
 	// with the last order served this will end 
 	while (!EventsQueue.isEmpty() || Ordassigned != Finshed_orders.GetCount()) {
 		ExecuteEvents(CurrentTimeStep);
@@ -62,7 +62,7 @@ void Restaurant::SimpleSimulator(PROG_MODE mode)
 			break;
 		case MODE_STEP:
 			pGUI->UpdateInterface();
-			//Sleep(1000);
+			Sleep(1000);
 			break;
 		default:
 			break;
@@ -450,9 +450,9 @@ void Restaurant::increment_Waiting_Time()
 		{
 			VO_Array[i]->setWaitingTime(VO_Array[i]->getWaitingTime() + 1);
 			//The time step after this will be the one were the VIP order cannot wait any longer and should be assigned
+			
 			//VO_Array[i]->getWaitingTime() == VIP_WT , This line is the condition for the VIPs to become urgent
 			//( VO_Array[i]->getWaitingTime() - AutoP) == VIP_WT , This line is the condition for the Normal who have been autopromoted to become urgent
-
 			if (VO_Array[i]->getWaitingTime() == VIP_WT || ( VO_Array[i]->getWaitingTime() - AutoP) == VIP_WT)
 			{
 				//It's time to be an URGENT order
@@ -476,7 +476,6 @@ void Restaurant::increment_Waiting_Time()
 			NO_Array[i]->setWaitingTime(NO_Array[i]->getWaitingTime() + 1);
 			if (NO_Array[i]->getWaitingTime() == AutoP)
 			{
-				//RemoveFromWaiting_NO(NO_Array[i]->GetID());
 				Waiting_NO.deleteNode(NO_Array[i]);
 				NO_Array[i]->SetType(TYPE_VIP);
 				ToVIP(NO_Array[i]);
@@ -506,8 +505,6 @@ bool Restaurant::Assign_To_InBreak_Cook(Order* InSRV_O, Cook* &AC)
 		AC->setStatus(BUSY); //update the cooker'status to "BUSY"
 		AC->setCurrentOrder(InSRV_O); // assign the order to the cooker
 		Assigned_cook.enqueue(AC);
-		AC->setHad_Urgent(true);
-		AC->setSpeed((AC->getSpeed()) / 2); //His speed should be its half till the next break inshallah
 		return true;
 	}
 	return false;
@@ -569,19 +566,23 @@ bool Restaurant::Assign_To_GC(Order* InSRV_O, Cook* &AC)
 	return false;
 }
 
+//****************************injury ************************
+
 void Restaurant::InjureACook(int currtime)
 {
 	float R;// Random number expresses the possibility of injury
 
-	//****************************injury ************************
 	Cook* injuredC;
 	Order* injuredC_Ord;
 
 	R = float(rand() % 11) / 10; //Number between (0->10) is generated then divided by 10 (0, 0.1, 0.2, 0.3, ..... 0.9, 1)
 
+	//The cook will be injured if he isn't an injured cook already
+	//The cook will be injured if the generated random no. is < = the no. read from the input_file
+	//The cook won't be injured if he was taken from his rest and serving an urgent order
 	if (R <= InjProp && !busy_cooks.isEmpty() && busy_cooks.Peek()->getStatus() != INJURED && !((busy_cooks.Peek())->getHad_Urgent()))
 	{
-		//the dequeue and the enqueue to enter the cook at the correct position after injury
+		//the dequeue and the enqueue are made to enter the cook at the correct position after injury
 		//the same will be done with the order assigned to this injured cook (to reEnter the order in its correct position after changing the FT)
 
 

@@ -4,15 +4,16 @@
 Cook::Cook()
 {
 	status = AVAILABLE;
-	currentOrder = nullptr;//menna
+	currentOrder = nullptr;
 	finishedOrders = 0;
 	Got_Injured = false;
+	Had_Urgent = false;
 }
 
 
 Cook::~Cook()
 {
-	currentOrder = nullptr;//menna
+	currentOrder = nullptr;
 }
 
 

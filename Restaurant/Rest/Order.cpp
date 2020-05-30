@@ -23,7 +23,7 @@ Order::Order(int id, ORD_TYPE r_type, double money, int r_size, int etime) {
 	//when the order has just arrived(created), the time it waited is initially 0
 	setWaitingTime(0);   
 
-	//-1 is an itial value indicates it hasnot been assigned to a cook yet
+	//-1 is an initial value indicates it hasnot been assigned to a cook yet
 	setFinishTime(-1);
 	setServTime(-1);
 	

@@ -179,8 +179,8 @@ public:
 	TNode<T>* find_min();
 	bool isEmpty()const;
 	void enqueue(T item);
-	T dequeue();//menna//modified the return type to be T*
-	T Peek(); //menna//modified the return type to be T*
+	T dequeue(); 
+	T Peek(); 
 	void Print_preorder();
 	T* toArray();
 	int getCount() const { return count; }

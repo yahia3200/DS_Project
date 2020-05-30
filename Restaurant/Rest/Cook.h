@@ -19,7 +19,7 @@ class Cook
 	int rst_prd;//Rest Period for medication
 	
 	//This flag is used to keep track of the cooks that has been assigned to an urgent order, so that we can know when to restore it's speed. 
-	bool Had_Urgent; //true if the cook has been assigned to an urgent order // false, if it hasn't been assigned to an urgent order
+	bool Had_Urgent; //true if the cook was taken from his rest to be assigned to an urgent order. (This flag helps restoring the speed of the cook when he reaches his next break)
 	bool Got_Injured; //this flag to check if the cook ever got injured
 public:
 	Cook();
