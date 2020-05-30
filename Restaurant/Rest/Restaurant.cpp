@@ -62,7 +62,7 @@ void Restaurant::SimpleSimulator(PROG_MODE mode)
 			break;
 		case MODE_STEP:
 			pGUI->UpdateInterface();
-			//Sleep(1000);
+			Sleep(1000);
 			break;
 		default:
 			break;
