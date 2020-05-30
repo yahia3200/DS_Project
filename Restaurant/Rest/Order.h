@@ -19,7 +19,7 @@ protected:
 	
 
 public:
-	//Order();//menna// added a default constructure needed for class TNode (copy constructor)
+	//Order(); added a default constructure needed for class TNode (copy constructor)
 	Order(int ID, ORD_TYPE r_Type);
 	Order(int id, ORD_TYPE r_type, double money, int r_size, int etime);
 	virtual ~Order();
@@ -46,7 +46,7 @@ public:
 	void setFinishTime(int T);
 	int getFinishTime() const;
 
-	void setWaitingTime(int T);  //Finish Time will be set also here
+	void setWaitingTime(int T);  
 	int getWaitingTime() const;
 
 	
