@@ -17,6 +17,7 @@ void PromoteEvent::Execute(Restaurant* pRest)
 	{
 		orgOrder->setTotalMoney(orgOrder->getTotalMoney() + ExtraMoney);
 		orgOrder->SetType(TYPE_VIP);
+		orgOrder->set_Was_promoted(true);
 		pRest->ToVIP(orgOrder);
 	}
 }

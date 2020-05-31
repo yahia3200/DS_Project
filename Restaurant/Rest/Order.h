@@ -16,7 +16,7 @@ protected:
 	int orderSize;  //Number of dishes
 
 	int ArrTime, ServTime, FinishTime, WaitingTime;	//arrival, service start,  finish and waiting Time
-	
+	bool Was_promoted; //changed from normal to vip
 
 public:
 	//Order(); added a default constructure needed for class TNode (copy constructor)
@@ -49,6 +49,8 @@ public:
 	void setWaitingTime(int T);  
 	int getWaitingTime() const;
 
+	void set_Was_promoted(bool);
+	bool get_Was_promoted()const;
 	
 	bool operator==(const Order&);
 	bool operator>(const Order&);

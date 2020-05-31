@@ -453,7 +453,7 @@ void Restaurant::increment_Waiting_Time()
 			
 			//VO_Array[i]->getWaitingTime() == VIP_WT , This line is the condition for the VIPs to become urgent
 			//( VO_Array[i]->getWaitingTime() - AutoP) == VIP_WT , This line is the condition for the Normal who have been autopromoted to become urgent
-			if (VO_Array[i]->getWaitingTime() == VIP_WT || ( VO_Array[i]->getWaitingTime() - AutoP) == VIP_WT)
+			if ((VO_Array[i]->getWaitingTime() == VIP_WT && VO_Array[i]->get_Was_promoted()==false) || (( VO_Array[i]->getWaitingTime() - AutoP) == VIP_WT && VO_Array[i]->get_Was_promoted() == true))
 			{
 				//It's time to be an URGENT order
 				Waiting_VO.deleteNode(VO_Array[i]);
@@ -480,6 +480,7 @@ void Restaurant::increment_Waiting_Time()
 				NO_Array[i]->SetType(TYPE_VIP);
 				ToVIP(NO_Array[i]);
 				NumOfAutoPNO++;
+				NO_Array[i]->set_Was_promoted(true);
 			}
 		}
 		delete[] NO_Array;

@@ -51,8 +51,13 @@ void Cook::setType(ORD_TYPE t)
 
 void Cook::setSpeed(int s)
 {	
-	if (s <= 0)
+	if (s < 0)
 		throw "Unvalid Speed";
+	
+	//If the speed was 1 and got int-divided by 2 to be 0, then we will restore it to be 1
+	//i.e if the speed was 1, it will keep saturated at 1 :""
+	if (s == 0)
+	{ speed = 1; }
 
 	speed = s;
 }

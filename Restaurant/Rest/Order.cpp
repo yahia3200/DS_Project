@@ -9,7 +9,7 @@ Order::Order(int id, ORD_TYPE r_Type)
 	setWaitingTime(0);
 	setFinishTime(-1);
 	setServTime(-1);
-	
+	Was_promoted = false;
 }
 
 Order::Order(int id, ORD_TYPE r_type, double money, int r_size, int etime) {
@@ -26,7 +26,7 @@ Order::Order(int id, ORD_TYPE r_type, double money, int r_size, int etime) {
 	//-1 is an initial value indicates it hasnot been assigned to a cook yet
 	setFinishTime(-1);
 	setServTime(-1);
-	
+	Was_promoted = false;
 }
 
 Order::~Order()
@@ -111,6 +111,12 @@ int Order::getWaitingTime() const
 	return WaitingTime;
 }
 
+void Order :: set_Was_promoted(bool val) {
+	Was_promoted = val;
+}
+bool Order::get_Was_promoted()const {
+	return Was_promoted;
+}
 
 bool Order::operator==(const Order& O2)
 {
