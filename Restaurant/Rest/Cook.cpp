@@ -58,8 +58,8 @@ void Cook::setSpeed(int s)
 	//i.e if the speed was 1, it will keep saturated at 1 :""
 	if (s == 0)
 	{ speed = 1; }
-
-	speed = s;
+	else
+		speed = s;
 }
 
 int Cook::getSpeed() const
