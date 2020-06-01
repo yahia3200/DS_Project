@@ -79,7 +79,7 @@ void Restaurant::SimpleSimulator(PROG_MODE mode)
 }
 void Restaurant::LoadFile()
 {
-	ifstream inFile("InFile.txt");
+	ifstream inFile("Input6.txt");
 	
 	//UnComment this in case you want "random sequence" to be generated for each time you run the program
 	//srand(time(NULL));
