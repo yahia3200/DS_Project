@@ -81,8 +81,8 @@ void Restaurant::LoadFile()
 {
 	ifstream inFile("InFile.txt");
 	
-	//UnComment this in case you want "random sequence" to be generated for each time you run the program
-	//srand(time(NULL));
+	//Comment the below line in case you want "random sequence" to be the same for each time you run the program
+	srand(time(NULL));
 	
 	//Handling errors
 	if (!inFile.is_open())
